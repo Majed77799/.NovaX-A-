@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>NovaX AI — Effortless Conversations</title>
+
+  <meta name="theme-color" content="#0b1833">
+  <meta name="description" content="NovaX AI — Effortless Conversations. Powerful Outcomes.">
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(180deg, #0b1833, #1a0b2e);
+      color: white;
+      text-align: center;
+      overflow: hidden;
+    }
+    header {
+      padding: 20px;
+      font-size: 14px;
+      letter-spacing: 2px;
+      color: #cfe1ff;
+    }
+    h1 {
+      font-size: 2.5rem;
+      margin: 0.5em 0 0.2em;
+    }
+    p.sub {
+      font-size: 1.2rem;
+      color: rgba(160,195,255,.9);
+    }
+    .stage {
+      width: 300px;
+      height: 300px;
+      margin: 20px auto;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #9cc2ff, #5d6cff);
+      box-shadow: 0 0 50px rgba(92,108,255,0.6);
+      animation: float 6s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+    }
+    .cards {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 16px;
+      padding: 20px;
+    }
+    .card {
+      backdrop-filter: blur(10px);
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 12px;
+      padding: 16px;
+      width: 250px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+    }
+    .card h3 {
+      margin: 0 0 8px;
+      font-size: 16px;
+    }
+    .card p {
+      margin: 0;
+      font-size: 14px;
+      color: #b9c2e6;
+    }
+    .cta {
+      margin: 20px;
+    }
+    .btn {
+      padding: 14px 28px;
+      border-radius: 999px;
+      border: 0;
+      cursor: pointer;
+      font-weight: bold;
+      background: linear-gradient(90deg, #6aa7ff, #b26aff);
+      color: #0b1026;
+      font-size: 16px;
+      box-shadow: 0 10px 40px rgba(127,160,255,.35);
+    }
+    footer {
+      font-size: 12px;
+      padding: 20px;
+      color: #cfe1ff;
+    }
+    footer a {
+      color: #cfe1ff;
+      text-decoration: none;
+      margin: 0 5px;
+    }
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <header>NovaX AI</header>
+
+  <h1>Effortless Conversations</h1>
+  <p class="sub">Powerful Outcomes.</p>
+
+  <div class="stage"></div>
+
+  <div class="cards">
+    <div class="card">
+      <h3>Data Analysis in Seconds</h3>
+      <p>Debug and write code in multiple languages.</p>
+    </div>
+    <div class="card">
+      <h3>Your Daily Planner</h3>
+      <p>Automate routine tasks with ease.</p>
+    </div>
+  </div>
+
+  <div class="cta">
+    <button class="btn">Get Started</button>
+  </div>
+
+  <footer>
+    <a href="#">Privacy Policy</a> •
+    <a href="#">Terms and Conditions</a>
+  </footer>
+</body>
+</html>
