@@ -14,7 +14,7 @@
       background: linear-gradient(180deg, #0b1833, #1a0b2e);
       color: white;
       text-align: center;
-      overflow: hidden;
+      overflow-x: hidden;
     }
     header {
       padding: 20px;
