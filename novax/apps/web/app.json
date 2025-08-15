@@ -1,0 +1,10 @@
+{
+  "expo": {
+    "name": "Novax Web",
+    "slug": "novax-web",
+    "scheme": "novax",
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}

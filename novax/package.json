@@ -1,0 +1,25 @@
+{
+  "name": "novax",
+  "private": true,
+  "version": "0.0.1",
+  "packageManager": "pnpm@9.7.0",
+  "workspaces": [
+    "apps/*",
+    "services/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "clean": "turbo run clean",
+    "mobile": "pnpm --filter @novax/mobile start",
+    "web": "pnpm --filter @novax/web start",
+    "api": "pnpm --filter @novax/api dev"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.5",
+    "typescript": "^5.9.2",
+    "@types/react": "^18.2.79"
+  }
+}
