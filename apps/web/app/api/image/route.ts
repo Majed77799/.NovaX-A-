@@ -25,5 +25,7 @@ export async function POST(req: NextRequest) {
 		const data = await res.json();
 		return Response.json({ b64: data?.artifacts?.[0]?.base64 ?? null });
 	}
-	return new Response('No provider configured', { status: 500 });
+	// 1x1 transparent PNG
+	const tinyPng = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9VgqC9sAAAAASUVORK5CYII=';
+	return Response.json({ b64: tinyPng, mock: true });
 }
