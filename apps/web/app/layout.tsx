@@ -1,4 +1,4 @@
-import './styles.css'
+import '../styles.css'
 import Providers from './providers'
 import type { ReactNode } from 'react'
 
