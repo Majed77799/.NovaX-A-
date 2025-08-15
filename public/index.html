@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>AI Image Gen + Lightweight Editor</title>
+	<style>
+		body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; margin: 0; padding: 20px; background: #0f172a; color: #e2e8f0; }
+		.container { max-width: 960px; margin: 0 auto; }
+		h1 { margin: 0 0 16px; font-size: 22px; }
+		.controls { display: grid; grid-template-columns: 1fr auto; gap: 8px; margin-bottom: 16px; }
+		input[type="text"], input[type="number"] { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #334155; background: #0b1220; color: #e2e8f0; }
+		button { padding: 10px 14px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: #e2e8f0; cursor: pointer; }
+		button:disabled { opacity: .6; cursor: not-allowed; }
+		#canvas { width: 100%; max-width: 512px; background: #0b1220; border: 1px dashed #334155; border-radius: 8px; }
+		.toolbar { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
+		.hidden { display: none; }
+		label { font-size: 12px; color: #94a3b8; }
+	</style>
+</head>
+<body>
+	<div class="container">
+		<h1>AI Image Gen + Lightweight Editor</h1>
+		<div class="controls">
+			<input id="prompt" type="text" placeholder="Describe the image..." />
+			<button id="gen">Generate</button>
+		</div>
+		<small id="status"></small>
+
+		<canvas id="canvas" width="512" height="512"></canvas>
+		<div id="editorToolbar" class="toolbar hidden">
+			<button id="cropMode">Crop</button>
+			<label>Brightness <input id="brightness" type="range" min="-100" max="100" value="0" /></label>
+			<input id="textInput" type="text" placeholder="Add text..." />
+			<button id="addText">Add Text</button>
+			<button id="save">Save</button>
+		</div>
+	</div>
+
+	<script type="module">
+		const statusEl = document.getElementById('status');
+		const promptEl = document.getElementById('prompt');
+		const genBtn = document.getElementById('gen');
+		const canvas = document.getElementById('canvas');
+		const toolbar = document.getElementById('editorToolbar');
+
+		let editor = null;
+
+		async function ensureEditor() {
+			if (editor) return editor;
+			const mod = await import('./light-editor.js');
+			editor = mod.createEditor(canvas);
+			toolbar.classList.remove('hidden');
+			return editor;
+		}
+
+		async function generate() {
+			const prompt = promptEl.value.trim();
+			if (!prompt) return;
+			genBtn.disabled = true; statusEl.textContent = 'Generating...';
+			try {
+				const res = await fetch('/api/image', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt }) });
+				if (!res.ok) throw new Error('Failed');
+				const data = await res.json();
+				const img = new Image(); img.src = data.imageDataUrl; await img.decode();
+				const ed = await ensureEditor();
+				ed.loadImage(img);
+				statusEl.textContent = 'Image loaded. You can edit now.';
+			} catch (e) {
+				console.error(e); statusEl.textContent = 'Error generating image.';
+			} finally {
+				genBtn.disabled = false;
+			}
+		}
+
+		genBtn.addEventListener('click', generate);
+
+		// Wire up toolbar once editor is loaded lazily
+		document.getElementById('cropMode').addEventListener('click', async () => (await ensureEditor()).toggleCropMode());
+		document.getElementById('brightness').addEventListener('input', async (e) => (await ensureEditor()).setBrightness(parseInt(e.target.value, 10)));
+		document.getElementById('addText').addEventListener('click', async () => {
+			const text = document.getElementById('textInput').value;
+			(await ensureEditor()).addText(text);
+		});
+		document.getElementById('save').addEventListener('click', async () => {
+			const ed = await ensureEditor();
+			const dataUrl = ed.export();
+			statusEl.textContent = 'Saving...';
+			try {
+				const res = await fetch('/api/upload', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ imageDataUrl: dataUrl }) });
+				const out = await res.json();
+				if (!res.ok || !out.ok) throw new Error('Upload failed');
+				statusEl.textContent = out.publicUrl ? `Saved to cloud: ${out.publicUrl}` : `Saved locally: ${out.localPath}`;
+			} catch (e) {
+				console.error(e); statusEl.textContent = 'Save failed';
+			}
+		});
+	</script>
+</body>
+</html>
