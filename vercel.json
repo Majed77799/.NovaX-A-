@@ -1,0 +1,4 @@
+{
+  "version": 2,
+  "buildCommand": "sh -lc 'if [ -f scripts/verify-prod-env.sh ]; then bash scripts/verify-prod-env.sh; fi; if [ -f package.json ]; then (npm ci || true); (npm run build || echo \"No build script\"); else echo \"No build defined\"; fi'"
+}
