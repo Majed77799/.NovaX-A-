@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>NovaX AI — Effortless Conversations</title>
+
+  <meta name="theme-color" content="#0b1833">
+  <meta name="description" content="NovaX AI — Effortless Conversations. Powerful Outcomes.">
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(180deg, #0b1833, #1a0b2e);
+      color: white;
+      text-align: center;
+      overflow-x: hidden;
+    }
+    header {
+      padding: 20px;
+      font-size: 14px;
+      letter-spacing: 2px;
+      color: #cfe1ff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    h1 {
+      font-size: 2.5rem;
+      margin: 0.5em 0 0.2em;
+    }
+    p.sub {
+      font-size: 1.2rem;
+      color: rgba(160,195,255,.9);
+    }
+    .stage {
+      width: 300px;
+      height: 300px;
+      margin: 20px auto;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #9cc2ff, #5d6cff);
+      box-shadow: 0 0 50px rgba(92,108,255,0.6);
+      animation: float 6s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+    }
+    .cards {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 16px;
+      padding: 20px;
+    }
+    .card {
+      backdrop-filter: blur(10px);
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 12px;
+      padding: 16px;
+      width: 250px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+    }
+    .card h3 {
+      margin: 0 0 8px;
+      font-size: 16px;
+    }
+    .card p {
+      margin: 0;
+      font-size: 14px;
+      color: #b9c2e6;
+    }
+    .cta {
+      margin: 20px;
+    }
+    .btn {
+      padding: 14px 28px;
+      border-radius: 999px;
+      border: 0;
+      cursor: pointer;
+      font-weight: bold;
+      background: linear-gradient(90deg, #6aa7ff, #b26aff);
+      color: #0b1026;
+      font-size: 16px;
+      box-shadow: 0 10px 40px rgba(127,160,255,.35);
+    }
+    footer {
+      font-size: 12px;
+      padding: 20px;
+      color: #cfe1ff;
+    }
+    footer a {
+      color: #cfe1ff;
+      text-decoration: none;
+      margin: 0 5px;
+    }
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    .settings-btn {
+      background: rgba(255,255,255,0.1);
+      color: #cfe1ff;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 8px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .settings-btn:hover {
+      background: rgba(255,255,255,0.18);
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .hidden { display: none; }
+    .modal-card {
+      width: 92%;
+      max-width: 560px;
+      background: #0f1a36;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 12px;
+      text-align: right;
+    }
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .modal-body {
+      padding: 16px;
+      text-align: right;
+    }
+    .section-title {
+      font-size: 14px;
+      color: #9fb6f5;
+      margin: 12px 0 8px;
+    }
+    .modal a { color: #cfe1ff; text-decoration: none; }
+    .modal a:hover { text-decoration: underline; }
+
+    .form-field { text-align: right; margin: 10px 0; }
+    .form-field label { font-size: 12px; color: #b9c2e6; display: block; margin-bottom: 6px; }
+    .form-field input, .form-field textarea {
+      width: 100%;
+      box-sizing: border-box;
+      background: rgba(255,255,255,0.08);
+      color: #e8eeff;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-family: inherit;
+      font-size: 14px;
+    }
+    .form-actions { display: flex; gap: 8px; justify-content: flex-start; margin-top: 10px; }
+    .secondary-btn {
+      background: transparent;
+      color: #cfe1ff;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 8px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .submit-btn {
+      padding: 10px 16px;
+      border-radius: 8px;
+      border: 0;
+      cursor: pointer;
+      font-weight: bold;
+      background: linear-gradient(90deg, #6aa7ff, #b26aff);
+      color: #0b1026;
+      font-size: 14px;
+      box-shadow: 0 10px 40px rgba(127,160,255,.35);
+    }
+    .status { font-size: 12px; color: #b9c2e6; min-height: 18px; margin-top: 6px; text-align: right; }
+  </style>
+  <script defer src="/app.js"></script>
+</head>
+<body>
+  <header>
+    <div>NovaX AI</div>
+    <button id="settingsButton" class="settings-btn">الإعدادات</button>
+  </header>
+
+  <h1>Effortless Conversations</h1>
+  <p class="sub">Powerful Outcomes.</p>
+
+  <div class="stage"></div>
+
+  <div class="cards">
+    <div class="card">
+      <h3>Data Analysis in Seconds</h3>
+      <p>Debug and write code in multiple languages.</p>
+    </div>
+    <div class="card">
+      <h3>Your Daily Planner</h3>
+      <p>Automate routine tasks with ease.</p>
+    </div>
+  </div>
+
+  <div class="cta">
+    <button class="btn">Get Started</button>
+  </div>
+
+  <footer>
+    <a href="/privacy.html">Privacy Policy</a> •
+    <a href="/terms.html">Terms and Conditions</a>
+  </footer>
+
+  <div id="settingsModal" class="modal hidden" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+      <div class="modal-header">
+        <div id="settingsTitle">الإعدادات</div>
+        <button id="closeSettings" class="secondary-btn">إغلاق</button>
+      </div>
+      <div class="modal-body">
+        <div class="section">
+          <div class="section-title">Legal</div>
+          <div>
+            <a href="/privacy.html">Privacy Policy</a> •
+            <a href="/terms.html">Terms and Conditions</a>
+          </div>
+        </div>
+
+        <div class="section" style="margin-top: 16px;">
+          <div class="section-title">Feedback</div>
+          <form id="feedbackForm">
+            <div class="form-field">
+              <label for="feedbackEmail">Email (optional)</label>
+              <input id="feedbackEmail" name="email" type="email" placeholder="you@example.com" />
+            </div>
+            <div class="form-field">
+              <label for="feedbackMessage">Message</label>
+              <textarea id="feedbackMessage" name="message" rows="4" placeholder="Share your feedback..." required></textarea>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="submit-btn" id="feedbackSubmit">Send Feedback</button>
+              <button type="button" id="cancelFeedback" class="secondary-btn">Cancel</button>
+            </div>
+            <div id="feedbackStatus" class="status"></div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
