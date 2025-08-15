@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Offline-First Messaging Demo</title>
+	<link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+	<header class="topbar">
+		<div class="brand">Offline-First Demo</div>
+		<div id="connection-chip" class="chip" title="Connection status">Offline</div>
+	</header>
+
+	<main class="container">
+		<section class="panel">
+			<h2>Compose Message</h2>
+			<form id="message-form">
+				<label for="message-input" class="sr-only">Message</label>
+				<textarea id="message-input" rows="3" placeholder="Type a message..."></textarea>
+				<div class="actions">
+					<button id="send-button" type="submit">Send</button>
+				</div>
+			</form>
+		</section>
+
+		<section class="panel">
+			<h2>Outbox (queued)</h2>
+			<ul id="outbox-list" class="list"></ul>
+		</section>
+
+		<section class="panel">
+			<h2>Sent Messages</h2>
+			<ul id="messages-list" class="list"></ul>
+		</section>
+
+		<section class="panel">
+			<h2>Templates</h2>
+			<div class="template-actions">
+				<button id="load-templates">Load Sample Templates</button>
+				<button id="clear-templates" class="secondary">Clear Templates</button>
+			</div>
+			<ul id="templates-list" class="list"></ul>
+		</section>
+
+		<section class="panel">
+			<h2>Settings</h2>
+			<div class="settings">
+				<label>
+					<span>API Base URL</span>
+					<input id="api-base-input" type="url" placeholder="https://api.example.com" />
+				</label>
+				<div class="actions">
+					<button id="save-settings" class="secondary">Save Settings</button>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<script type="module" src="./app.js"></script>
+</body>
+</html>

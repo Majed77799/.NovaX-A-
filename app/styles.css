@@ -1,0 +1,156 @@
+* {
+	box-sizing: border-box;
+}
+
+:root {
+	--bg: #0b0f14;
+	--panel: #11161d;
+	--text: #e6edf3;
+	--muted: #9aa7b2;
+	--accent: #7c93ff;
+	--accent-weak: rgba(124,147,255,0.2);
+	--danger: #ff6b6b;
+	--success: #2ecc71;
+	--chip-offline-bg: #3a2a2a;
+	--chip-online-bg: #243a2a;
+}
+
+html, body {
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	background: var(--bg);
+	color: var(--text);
+	font: 14px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+}
+
+.topbar {
+	position: sticky;
+	top: 0;
+	z-index: 10;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 12px 16px;
+	background: rgba(17,22,29,0.8);
+	backdrop-filter: blur(6px);
+	border-bottom: 1px solid #202734;
+}
+
+.brand {
+	font-weight: 600;
+}
+
+.chip {
+	padding: 4px 10px;
+	border-radius: 999px;
+	background: var(--chip-offline-bg);
+	color: #ffd2d2;
+	border: 1px solid rgba(255,255,255,0.08);
+	font-size: 12px;
+}
+
+.chip.online {
+	background: var(--chip-online-bg);
+	color: #c1ffd7;
+}
+
+.container {
+	max-width: 1100px;
+	margin: 16px auto;
+	padding: 0 16px;
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+	gap: 16px;
+}
+
+.panel {
+	background: var(--panel);
+	border: 1px solid #1f2733;
+	border-radius: 10px;
+	padding: 12px;
+}
+
+h2 {
+	margin: 8px 0 12px;
+	font-size: 16px;
+}
+
+textarea, input[type="url"] {
+	width: 100%;
+	border-radius: 8px;
+	border: 1px solid #2a3443;
+	background: #0f141b;
+	color: var(--text);
+	padding: 10px 12px;
+	resize: vertical;
+}
+
+button {
+	appearance: none;
+	border: 1px solid #2b3a55;
+	background: #141a24;
+	color: var(--text);
+	border-radius: 8px;
+	padding: 8px 12px;
+	cursor: pointer;
+	transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+button:hover {
+	border-color: #3b5280;
+	background: #151f2f;
+}
+
+button.secondary {
+	background: transparent;
+}
+
+.actions {
+	display: flex;
+	gap: 8px;
+	margin-top: 8px;
+}
+
+.list {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	display: grid;
+	gap: 8px;
+}
+
+.list li {
+	padding: 8px 10px;
+	border: 1px solid #1f2733;
+	background: #0e131a;
+	border-radius: 8px;
+	display: flex;
+	justify-content: space-between;
+	gap: 12px;
+	align-items: center;
+}
+
+.list .meta {
+	color: var(--muted);
+	font-size: 12px;
+}
+
+.template-actions {
+	display: flex;
+	gap: 8px;
+	margin-bottom: 8px;
+	flex-wrap: wrap;
+}
+
+.sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
