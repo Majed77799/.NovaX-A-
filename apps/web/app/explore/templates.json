@@ -1,0 +1,4 @@
+[
+	{ "id": "sum-1", "title": "Daily Summary", "prompt": "Summarize my day in 3 concise bullet points." },
+	{ "id": "todo-1", "title": "Weekly To‑Do", "prompt": "Create a to‑do list for this week with priorities." }
+]
