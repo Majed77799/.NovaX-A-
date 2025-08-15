@@ -1,6 +1,10 @@
-# Ello Perfect Replica (Web + Mobile)
+# Ello Replica Monorepo
 
-Monorepo with Next.js 14 PWA (`apps/web`) and Expo Go app (`apps/mobile`), plus shared packages for AI orchestration and utilities.
+This monorepo contains web and mobile apps plus shared packages.
+
+## New: AI Content Generator
+- See `CONTENT_GENERATOR_GUIDE.md` for setup and usage.
+- Mobile app now includes a Generator tab for creating marketing content powered by OpenAI.
 
 ## Install
 

@@ -1,5 +1,5 @@
 {
-  "name": "@repo/api-client",
+  "name": "@repo/market-analysis",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -9,10 +9,13 @@
     "build": "tsc -p tsconfig.json -d --emitDeclarationOnly",
     "lint": "echo noop",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "dev": "echo noop",
-    "test": "echo no tests"
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "zod": "^3.23.8"
   },
   "devDependencies": {
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "vitest": "^2.0.5"
   }
 }

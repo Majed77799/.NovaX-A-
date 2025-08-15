@@ -3,6 +3,7 @@ import { Platform, SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, 
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import * as Font from 'expo-font';
+import ContentGenerator from './modules/ContentGenerator';
 
 const ORB_SIZE = 96;
 
@@ -10,11 +11,14 @@ type Message = { id: string; role: 'user'|'assistant'|'system'; content: string 
 
 type OrbState = 'idle'|'thinking'|'speaking';
 
+type Tab = 'chat'|'generate';
+
 export default function App() {
 	const [fontLoaded, setFontLoaded] = useState(false);
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [input, setInput] = useState('');
 	const [orb, setOrb] = useState<OrbState>('idle');
+	const [activeTab, setActiveTab] = useState<Tab>('chat');
 	const scrollRef = useRef<ScrollView>(null);
 
 	useEffect(() => {
@@ -53,36 +57,54 @@ export default function App() {
 	return (
 		<LinearGradient colors={["#F6E7FF","#E9F0FF","#D7F7FF"]} start={{x:0,y:0}} end={{x:1,y:1}} style={{ flex: 1 }}>
 			<SafeAreaView style={{ flex: 1 }}>
-				<View style={{ height: ORB_SIZE, width: ORB_SIZE, borderRadius: ORB_SIZE/2, margin: 12, shadowColor: '#7841FF', shadowOpacity: 0.35, shadowRadius: 16, backgroundColor: 'rgba(255,255,255,0.35)', overflow: 'hidden' }} />
-				<ScrollView ref={scrollRef} contentContainerStyle={{ padding: 16, paddingBottom: 140 }}>
-					{messages.map(m => (
-						<View key={m.id} style={{ maxWidth: '80%', alignSelf: m.role === 'assistant' ? 'flex-start' : 'flex-end', backgroundColor: m.role === 'assistant' ? 'rgba(255,255,255,0.5)' : '#fff', paddingHorizontal: 14, paddingVertical: 10, borderRadius: 16, marginBottom: 10, borderWidth: m.role==='assistant'?1:0, borderColor: 'rgba(255,255,255,0.25)' }}>
-							<Text style={{ fontFamily: fontLoaded ? 'Urbanist' : undefined, fontSize: 16, lineHeight: 22 }}>{m.content}</Text>
-						</View>
-					))}
-				</ScrollView>
-				<View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, padding: 16 }}>
-					<View style={{ backgroundColor: '#fff', borderRadius: 999, borderWidth: 1, borderColor: 'rgba(15,18,35,0.08)', padding: 10, flexDirection: 'row', alignItems: 'flex-end', gap: 8, shadowColor: '#101828', shadowOpacity: 0.06, shadowRadius: 20 }}>
-						<View style={{ flexDirection: 'row', gap: 6 }}>
-							<QuickChip label="Summarize" onPress={() => send('Summarize my day in 3 bullet points.')} />
-							<QuickChip label="Translate" onPress={() => send('Translate the last message to Spanish.')} />
-							<QuickChip label="To‑do" onPress={() => send('Create a to-do list for this week.')} />
-						</View>
-						<TextInput
-							style={{ flex: 1, paddingHorizontal: 12, paddingVertical: 8, maxHeight: 24*4, fontFamily: fontLoaded ? 'Urbanist' : undefined }}
-							value={input}
-							multiline
-							onChangeText={setInput}
-							onSubmitEditing={() => send(input)}
-							placeholder="Message Ello"
-						/>
-						<TouchableOpacity onPress={() => send(input)} activeOpacity={0.8} style={{ paddingHorizontal: 12, paddingVertical: 8 }}>
-							<Text>➤</Text>
-						</TouchableOpacity>
-					</View>
+				<View style={{ flexDirection: 'row', gap: 12, padding: 12 }}>
+					<HeaderTab label="Chat" active={activeTab==='chat'} onPress={() => setActiveTab('chat')} />
+					<HeaderTab label="Generator" active={activeTab==='generate'} onPress={() => setActiveTab('generate')} />
 				</View>
+				{activeTab === 'generate' ? (
+					<ContentGenerator />
+				) : (
+					<>
+						<View style={{ height: ORB_SIZE, width: ORB_SIZE, borderRadius: ORB_SIZE/2, margin: 12, shadowColor: '#7841FF', shadowOpacity: 0.35, shadowRadius: 16, backgroundColor: 'rgba(255,255,255,0.35)', overflow: 'hidden' }} />
+						<ScrollView ref={scrollRef} contentContainerStyle={{ padding: 16, paddingBottom: 140 }}>
+							{messages.map(m => (
+								<View key={m.id} style={{ maxWidth: '80%', alignSelf: m.role === 'assistant' ? 'flex-start' : 'flex-end', backgroundColor: m.role === 'assistant' ? 'rgba(255,255,255,0.5)' : '#fff', paddingHorizontal: 14, paddingVertical: 10, borderRadius: 16, marginBottom: 10, borderWidth: m.role==='assistant'?1:0, borderColor: 'rgba(255,255,255,0.25)' }}>
+									<Text style={{ fontFamily: fontLoaded ? 'Urbanist' : undefined, fontSize: 16, lineHeight: 22 }}>{m.content}</Text>
+								</View>
+							))}
+						</ScrollView>
+						<View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, padding: 16 }}>
+							<View style={{ backgroundColor: '#fff', borderRadius: 999, borderWidth: 1, borderColor: 'rgba(15,18,35,0.08)', padding: 10, flexDirection: 'row', alignItems: 'flex-end', gap: 8, shadowColor: '#101828', shadowOpacity: 0.06, shadowRadius: 20 }}>
+								<View style={{ flexDirection: 'row', gap: 6 }}>
+									<QuickChip label="Summarize" onPress={() => send('Summarize my day in 3 bullet points.')} />
+									<QuickChip label="Translate" onPress={() => send('Translate the last message to Spanish.')} />
+									<QuickChip label="To‑do" onPress={() => send('Create a to-do list for this week.')} />
+								</View>
+								<TextInput
+									style={{ flex: 1, paddingHorizontal: 12, paddingVertical: 8, maxHeight: 24*4, fontFamily: fontLoaded ? 'Urbanist' : undefined }}
+									value={input}
+									multiline
+									onChangeText={setInput}
+									onSubmitEditing={() => send(input)}
+									placeholder="Message Ello"
+								/>
+								<TouchableOpacity onPress={() => send(input)} activeOpacity={0.8} style={{ paddingHorizontal: 12, paddingVertical: 8 }}>
+									<Text>➤</Text>
+								</TouchableOpacity>
+							</View>
+						</View>
+					</>
+				)}
 			</SafeAreaView>
 		</LinearGradient>
+	);
+}
+
+function HeaderTab({ label, active, onPress }: { label: string; active?: boolean; onPress: () => void }) {
+	return (
+		<TouchableOpacity onPress={onPress} activeOpacity={0.8} style={{ paddingHorizontal: 10, paddingVertical: 8, borderRadius: 999, borderWidth: 1, borderColor: active ? '#7841FF' : 'rgba(255,255,255,0.6)', backgroundColor: active ? 'rgba(120,65,255,0.1)' : 'rgba(255,255,255,0.6)' }}>
+			<Text>{label}</Text>
+		</TouchableOpacity>
 	);
 }
 

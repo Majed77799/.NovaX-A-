@@ -1,8 +1,11 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "jsx": "react-jsx",
-    "noEmit": true
+    "jsx": "react",
+    "types": ["vitest/globals"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "strict": true
   },
-  "include": ["**/*.ts", "**/*.tsx"]
+  "include": ["src"]
 }
