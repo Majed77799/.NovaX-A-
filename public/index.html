@@ -1,0 +1,102 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Memory & RAG Demo</title>
+	<style>
+		body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 20px; }
+		input, textarea, button, select { font-size: 14px; padding: 8px; }
+		label { display: block; margin-top: 10px; }
+		.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+		.card { border: 1px solid #ddd; border-radius: 8px; padding: 16px; margin: 12px 0; }
+		.results { white-space: pre-wrap; background: #fafafa; padding: 10px; border-radius: 8px; border: 1px solid #eee; }
+	</style>
+</head>
+<body>
+	<h2>Memory & RAG</h2>
+	<div class="card">
+		<div class="row">
+			<label>Device ID <input id="deviceId" placeholder="device-123" /></label>
+			<label>User ID <input id="userId" placeholder="user-abc" /></label>
+		</div>
+	</div>
+
+	<div class="card">
+		<h3>Upsert memory</h3>
+		<textarea id="memoryText" rows="3" style="width:100%" placeholder="Write something to remember..."></textarea>
+		<div class="row">
+			<button id="upsertBtn">Upsert</button>
+		</div>
+	</div>
+
+	<div class="card">
+		<h3>Search</h3>
+		<input id="query" placeholder="Search query" style="width: 60%" />
+		<button id="searchBtn">Search</button>
+		<pre id="results" class="results"></pre>
+	</div>
+
+	<div class="card">
+		<h3>Settings</h3>
+		<div class="row">
+			<button id="clearBtn">Clear memory</button>
+			<button id="exportBtn">Export memory</button>
+		</div>
+	</div>
+
+	<script>
+	const api = {
+		async upsert(deviceId, userId, text) {
+			const res = await fetch('/api/memory/upsert', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ deviceId, userId, text }) });
+			return res.json();
+		},
+		async search(deviceId, userId, query) {
+			const res = await fetch('/api/memory/search', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ deviceId, userId, query }) });
+			return res.json();
+		},
+		async clear(deviceId, userId) {
+			const res = await fetch('/api/memory/clear', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ deviceId, userId }) });
+			return res.json();
+		},
+		export(deviceId, userId) {
+			const url = new URL('/api/memory/export', window.location.origin);
+			if (deviceId) url.searchParams.set('deviceId', deviceId);
+			if (userId) url.searchParams.set('userId', userId);
+			window.location.href = url.toString();
+		}
+	};
+
+	function getIds() {
+		return { deviceId: document.getElementById('deviceId').value.trim(), userId: document.getElementById('userId').value.trim() };
+	}
+
+	document.getElementById('upsertBtn').addEventListener('click', async () => {
+		const { deviceId, userId } = getIds();
+		const text = document.getElementById('memoryText').value.trim();
+		if (!deviceId || !userId || !text) return alert('Provide deviceId, userId and text');
+		const res = await api.upsert(deviceId, userId, text);
+		alert(res.ok ? 'Saved' : ('Error: ' + res.error));
+	});
+
+	document.getElementById('searchBtn').addEventListener('click', async () => {
+		const { deviceId, userId } = getIds();
+		const q = document.getElementById('query').value.trim();
+		if (!deviceId || !userId || !q) return alert('Provide deviceId, userId and query');
+		const res = await api.search(deviceId, userId, q);
+		document.getElementById('results').textContent = res.ok ? JSON.stringify(res.results, null, 2) : ('Error: ' + res.error);
+	});
+
+	document.getElementById('clearBtn').addEventListener('click', async () => {
+		const { deviceId, userId } = getIds();
+		const res = await api.clear(deviceId || undefined, userId || undefined);
+		alert(res.ok ? ('Deleted: ' + res.deleted) : ('Error: ' + res.error));
+	});
+
+	document.getElementById('exportBtn').addEventListener('click', () => {
+		const { deviceId, userId } = getIds();
+		api.export(deviceId || undefined, userId || undefined);
+	});
+	</script>
+</body>
+</html>

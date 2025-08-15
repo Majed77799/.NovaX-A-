@@ -1,0 +1,35 @@
+{
+  "name": "workspace",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "NODE_ENV=development node --watch src/server.js",
+    "start": "NODE_ENV=production node src/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Majed77799/.NovaX-A-.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Majed77799/.NovaX-A-/issues"
+  },
+  "homepage": "https://github.com/Majed77799/.NovaX-A-#readme",
+  "description": "",
+  "type": "module",
+  "dependencies": {
+    "better-sqlite3": "^12.2.0",
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "jsdom": "^26.1.0",
+    "jsonlines": "^0.1.1",
+    "p-limit": "^7.0.0",
+    "pg": "^8.16.3",
+    "zod": "^4.0.17"
+  }
+}
