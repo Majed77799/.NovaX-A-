@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+
+# Turbo
+.turbo/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Build outputs
+build/
+dist/
+.out/
+.next/
+.expo/
+.expo-shared/
+expo-build/
+web-build/
+
+# Env
+.env*
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp

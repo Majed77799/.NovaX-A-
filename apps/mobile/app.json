@@ -1,0 +1,30 @@
+{
+	"expo": {
+		"name": "NovaX Mobile",
+		"slug": "novax-mobile",
+		"scheme": "novax",
+		"version": "0.1.0",
+		"orientation": "portrait",
+		"userInterfaceStyle": "automatic",
+		"assetBundlePatterns": ["**/*"],
+		"ios": {
+			"supportsTablet": true
+		},
+		"android": {
+			"adaptiveIcon": {
+				"foregroundImage": "./assets/adaptive-icon.png",
+				"backgroundColor": "#ffffff"
+			}
+		},
+		"web": {
+			"bundler": "metro",
+			"output": "static"
+		},
+		"plugins": [
+			"expo-router"
+		],
+		"experiments": {
+			"typedRoutes": true
+		}
+	}
+}

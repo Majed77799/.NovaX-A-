@@ -1,0 +1,19 @@
+# Ignore all monorepo packages by default
+**/node_modules
+**/.turbo
+**/.next/cache
+**/build
+**/dist
+**/.expo
+**/.expo-shared
+
+# Git
+.git
+.gitignore
+
+# Local env
+.env*
+
+# Editor
+.vscode
+.idea
