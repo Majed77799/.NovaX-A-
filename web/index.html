@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width,initial-scale=1" />
+	<title>NovaX Web</title>
+	<style>
+		body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #0b1833; color: #e8f0ff; }
+		h1 { margin: 0 0 10px; }
+		.controls { margin: 10px 0 20px; }
+		label { margin-right: 10px; }
+		.card { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; padding: 12px; margin: 8px 0; }
+		.small { color: #aac6ff; font-size: 12px; }
+		footer { margin-top: 30px; font-size: 12px; color: #aac6ff; }
+		code { color: #9cc2ff; }
+	</style>
+</head>
+<body>
+	<h1>NovaX Web</h1>
+	<div class="controls">
+		<label>API Base URL: <input id="api" size="40" value="http://127.0.0.1:8000" /></label>
+		<button id="refresh">Load Messages</button>
+	</div>
+	<div id="source" class="small"></div>
+	<div id="list"></div>
+	<footer>
+		Open the API with <code>uvicorn api.main:app --reload --host 0.0.0.0 --port 8000</code> then press Load Messages.
+	</footer>
+	<script>
+		async function fetchJson(url) {
+			const res = await fetch(url);
+			if (!res.ok) throw new Error(`HTTP ${res.status}`);
+			return res.json();
+		}
+		async function load() {
+			const base = document.getElementById('api').value.trim().replace(/\/$/, '');
+			try {
+				const src = await fetchJson(`${base}/source`);
+				document.getElementById('source').textContent = `Data source: ${src.source} — ${JSON.stringify(src.details)}`;
+				const data = await fetchJson(`${base}/messages`);
+				const list = document.getElementById('list');
+				list.innerHTML = '';
+				for (const m of data.messages) {
+					const div = document.createElement('div');
+					div.className = 'card';
+					div.innerHTML = `<div><strong>${m.author}</strong></div><div>${m.content}</div><div class="small">${m.created_at}</div>`;
+					list.appendChild(div);
+				}
+			} catch (e) {
+				document.getElementById('source').textContent = '';
+				document.getElementById('list').innerHTML = `<div class="card">Failed to load: ${e.message}</div>`;
+			}
+		}
+		document.getElementById('refresh').addEventListener('click', load);
+		// Auto-load if API reachable
+		load();
+	</script>
+</body>
+</html>
