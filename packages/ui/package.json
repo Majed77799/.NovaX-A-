@@ -1,0 +1,22 @@
+{
+  "name": "@novax/ui",
+  "version": "0.1.0",
+  "private": false,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "source": "src/index.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint .",
+    "clean": "rimraf dist node_modules"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1",
+    "react-native": "*"
+  },
+  "devDependencies": {
+    "typescript": "~5.6.2",
+    "rimraf": "^6.0.1"
+  }
+}
