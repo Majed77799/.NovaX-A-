@@ -1,0 +1,81 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment (production or preview)"
+        required: false
+        default: production
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+jobs:
+  deploy-web:
+    name: Deploy Web to Vercel
+    runs-on: ubuntu-latest
+    if: ${{ env.VERCEL_TOKEN != '' && env.VERCEL_ORG_ID != '' && env.VERCEL_PROJECT_ID != '' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Vercel CLI
+        run: npm i -g vercel@latest
+
+      - name: Deploy Web
+        id: deploy_web
+        env:
+          VERCEL_DEPLOY_PROD: ${{ (github.ref == 'refs/heads/main' && (github.event_name == 'push' || inputs.environment == 'production')) }}
+        run: |
+          bash scripts/deploy-web.sh
+
+      - name: Smoke check (web root)
+        env:
+          BASE_URL: ${{ steps.deploy_web.outputs.deployment_url }}
+        run: |
+          bash scripts/smoke-check.sh "/"
+
+  deploy-api:
+    name: Deploy API to Vercel
+    runs-on: ubuntu-latest
+    needs: deploy-web
+    if: ${{ env.VERCEL_TOKEN != '' && env.VERCEL_ORG_ID != '' && env.VERCEL_PROJECT_ID != '' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Vercel CLI
+        run: npm i -g vercel@latest
+
+      - name: Deploy API
+        id: deploy_api
+        env:
+          VERCEL_DEPLOY_PROD: ${{ (github.ref == 'refs/heads/main' && (github.event_name == 'push' || inputs.environment == 'production')) }}
+        run: |
+          bash scripts/deploy-api.sh
+
+      - name: Smoke check (api /api/health)
+        env:
+          BASE_URL: ${{ steps.deploy_api.outputs.deployment_url }}
+        run: |
+          bash scripts/smoke-check.sh "/api/health"
