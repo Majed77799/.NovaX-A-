@@ -95,6 +95,33 @@
     footer a:hover {
       text-decoration: underline;
     }
+    /* New: Settings + Toast styling */
+    .settings-card .row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 8px;
+    }
+    .settings-card input[type="file"] {
+      display: none;
+    }
+    .toast {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: #fff;
+      padding: 12px 16px;
+      border-radius: 8px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.35);
+      display: none;
+      z-index: 1000;
+    }
+    .toast.show {
+      display: block;
+    }
   </style>
 </head>
 <body>
@@ -114,6 +141,20 @@
       <h3>Your Daily Planner</h3>
       <p>Automate routine tasks with ease.</p>
     </div>
+    <div class="card settings-card">
+      <h3>Data Export / Import</h3>
+      <p>Export chats and memories as JSON; import merges safely. Undo available.</p>
+      <div class="row">
+        <button id="exportJsonBtn" class="btn">Export JSON</button>
+        <button id="copyJsonBtn" class="btn">Copy JSON</button>
+      </div>
+      <div class="row">
+        <input id="importFileInput" type="file" accept="application/json" />
+        <button id="pickFileBtn" class="btn">Choose File</button>
+        <button id="importJsonBtn" class="btn" disabled>Import</button>
+      </div>
+      <p id="importResult" style="font-size:12px;color:#b9c2e6;margin-top:8px;"></p>
+    </div>
   </div>
 
   <div class="cta">
@@ -124,5 +165,303 @@
     <a href="#">Privacy Policy</a> •
     <a href="#">Terms and Conditions</a>
   </footer>
+
+  <div id="toast" class="toast">
+    <span id="toastMessage"></span>
+    <button id="toastUndoBtn" class="btn" style="padding:6px 12px;font-size:12px;margin-inline-start:8px;">Undo</button>
+  </div>
+
+  <script>
+    (function() {
+      const STORAGE_KEYS = {
+        chats: 'novax_chats',
+        memories: 'novax_memories',
+        backup: 'novax_last_import_backup'
+      };
+
+      function safeParse(json, fallback) {
+        try { return JSON.parse(json); } catch { return fallback; }
+      }
+
+      function getChats() {
+        return safeParse(localStorage.getItem(STORAGE_KEYS.chats), []);
+      }
+      function getMemories() {
+        return safeParse(localStorage.getItem(STORAGE_KEYS.memories), []);
+      }
+      function setChats(value) {
+        localStorage.setItem(STORAGE_KEYS.chats, JSON.stringify(value));
+      }
+      function setMemories(value) {
+        localStorage.setItem(STORAGE_KEYS.memories, JSON.stringify(value));
+      }
+
+      function sortedKeysStringify(value) {
+        const seen = new WeakSet();
+        const sorter = (val) => {
+          if (val === null || typeof val !== 'object') return val;
+          if (seen.has(val)) return undefined;
+          seen.add(val);
+          if (Array.isArray(val)) return val.map(sorter);
+          const out = {};
+          Object.keys(val).sort().forEach(k => { out[k] = sorter(val[k]); });
+          return out;
+        };
+        return JSON.stringify(sorter(value));
+      }
+
+      function fingerprintItem(item) {
+        // Ignore volatile timestamps when comparing content
+        const { updatedAt, createdAt, ...rest } = item || {};
+        return hashString(sortedKeysStringify(rest));
+      }
+
+      function ensureId(item) {
+        if (item && item.id) return String(item.id);
+        return 'id_' + fingerprintItem(item);
+      }
+
+      function toNumericTime(v) {
+        if (!v) return 0;
+        const t = typeof v === 'string' ? Date.parse(v) : Number(v);
+        return Number.isFinite(t) ? t : 0;
+      }
+
+      function hashString(str) {
+        let hash = 5381;
+        for (let i = 0; i < str.length; i++) {
+          hash = ((hash << 5) + hash) + str.charCodeAt(i);
+          hash = hash & 0xffffffff;
+        }
+        return (hash >>> 0).toString(16);
+      }
+
+      function mergeArrays(existing, incoming) {
+        const byId = new Map();
+        const byFp = new Map();
+        const result = [];
+
+        for (const item of existing) {
+          const id = ensureId(item);
+          const fp = fingerprintItem(item);
+          const normalized = { ...item, id };
+          byId.set(id, normalized);
+          byFp.set(fp, normalized);
+          result.push(normalized);
+        }
+
+        let added = 0, updated = 0, unchanged = 0;
+
+        for (const raw of incoming) {
+          const item = { ...raw };
+          const id = ensureId(item);
+          const fp = fingerprintItem(item);
+          const existingById = byId.get(id);
+          const existingByFp = byFp.get(fp);
+
+          if (existingById) {
+            const exTime = toNumericTime(existingById.updatedAt);
+            const inTime = toNumericTime(item.updatedAt);
+            if (inTime > exTime) {
+              // replace in result
+              const idx = result.findIndex(x => ensureId(x) === id);
+              if (idx !== -1) result[idx] = { ...item, id };
+              byId.set(id, { ...item, id });
+              byFp.set(fp, { ...item, id });
+              updated++;
+            } else {
+              // check content equality ignoring timestamps
+              const same = fingerprintItem(existingById) === fp;
+              if (same) unchanged++; else {
+                // keep the one with newer or larger content
+                const idx = result.findIndex(x => ensureId(x) === id);
+                if (idx !== -1) result[idx] = exTime >= inTime ? existingById : { ...item, id };
+                updated += exTime >= inTime ? 0 : 1;
+              }
+            }
+          } else if (existingByFp) {
+            // content exists but id differs -> treat as unchanged
+            unchanged++;
+          } else {
+            result.push({ ...item, id });
+            byId.set(id, { ...item, id });
+            byFp.set(fp, { ...item, id });
+            added++;
+          }
+        }
+
+        return { merged: result, stats: { added, updated, unchanged, total: result.length } };
+      }
+
+      function buildExportPayload() {
+        const chats = getChats();
+        const memories = getMemories();
+        return {
+          version: 1,
+          exportedAt: new Date().toISOString(),
+          chats,
+          memories
+        };
+      }
+
+      function triggerDownload(filename, text) {
+        const blob = new Blob([text], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      }
+
+      function showToast(message, opts) {
+        const toast = document.getElementById('toast');
+        const msg = document.getElementById('toastMessage');
+        const undoBtn = document.getElementById('toastUndoBtn');
+        const options = opts || {};
+        msg.textContent = message;
+        if (options.onUndo) {
+          undoBtn.style.display = 'inline-block';
+          undoBtn.onclick = function() {
+            try { options.onUndo(); } finally { hideToast(); }
+          };
+        } else {
+          undoBtn.style.display = 'none';
+          undoBtn.onclick = null;
+        }
+        toast.classList.add('show');
+        clearTimeout(window.__toastTimer);
+        const ms = options.autoHideMs === 0 ? 0 : (options.autoHideMs || 7000);
+        if (ms) window.__toastTimer = setTimeout(hideToast, ms);
+      }
+      function hideToast() {
+        const toast = document.getElementById('toast');
+        toast.classList.remove('show');
+      }
+
+      function backupCurrentData(stats) {
+        const backup = {
+          timestamp: Date.now(),
+          chatsPrev: getChats(),
+          memoriesPrev: getMemories(),
+          stats: stats || null
+        };
+        localStorage.setItem(STORAGE_KEYS.backup, JSON.stringify(backup));
+      }
+
+      function undoImport() {
+        const backup = safeParse(localStorage.getItem(STORAGE_KEYS.backup), null);
+        if (!backup) return false;
+        setChats(backup.chatsPrev || []);
+        setMemories(backup.memoriesPrev || []);
+        localStorage.removeItem(STORAGE_KEYS.backup);
+        return true;
+      }
+
+      async function copyToClipboard(text) {
+        try {
+          if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(text);
+            return true;
+          }
+        } catch {}
+        // Fallback
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        const ok = document.execCommand('copy');
+        ta.remove();
+        return ok;
+      }
+
+      function handleExportDownload() {
+        const payload = buildExportPayload();
+        const json = JSON.stringify(payload, null, 2);
+        const ts = new Date().toISOString().replace(/[:.]/g, '-');
+        const filename = `novax-export-${ts}.json`;
+        triggerDownload(filename, json);
+        const c = (payload.chats || []).length;
+        const m = (payload.memories || []).length;
+        showToast(`Exported ${c} chats and ${m} memories.`, { autoHideMs: 4000 });
+      }
+
+      async function handleExportCopy() {
+        const payload = buildExportPayload();
+        const json = JSON.stringify(payload);
+        const ok = await copyToClipboard(json);
+        const c = (payload.chats || []).length;
+        const m = (payload.memories || []).length;
+        showToast(ok ? `Copied export (\u2264 ${c} chats, ${m} memories).` : 'Copy failed. Download instead.', { autoHideMs: 5000 });
+      }
+
+      function importFromPayload(payload) {
+        const incomingChats = Array.isArray(payload && payload.chats) ? payload.chats : [];
+        const incomingMemories = Array.isArray(payload && payload.memories) ? payload.memories : [];
+
+        const chatsMerge = mergeArrays(getChats(), incomingChats);
+        const memoriesMerge = mergeArrays(getMemories(), incomingMemories);
+
+        backupCurrentData({ chats: chatsMerge.stats, memories: memoriesMerge.stats });
+        setChats(chatsMerge.merged);
+        setMemories(memoriesMerge.merged);
+
+        const added = chatsMerge.stats.added + memoriesMerge.stats.added;
+        const updated = chatsMerge.stats.updated + memoriesMerge.stats.updated;
+        const unchanged = chatsMerge.stats.unchanged + memoriesMerge.stats.unchanged;
+
+        const msg = `Imported: ${added} added, ${updated} updated, ${unchanged} unchanged.`;
+        document.getElementById('importResult').textContent = msg;
+        showToast(`${msg}`, { onUndo: () => { if (undoImport()) showToast('Import undone.', { autoHideMs: 3000 }); } });
+      }
+
+      function handleImportFile(file) {
+        const reader = new FileReader();
+        reader.onload = function() {
+          try {
+            const payload = JSON.parse(reader.result);
+            if (!payload || typeof payload !== 'object') throw new Error('Invalid JSON');
+            importFromPayload(payload);
+          } catch (e) {
+            showToast('Invalid or corrupted JSON file.', { autoHideMs: 5000 });
+          }
+        };
+        reader.onerror = function() {
+          showToast('Failed to read file.', { autoHideMs: 5000 });
+        };
+        reader.readAsText(file);
+      }
+
+      // Wire up UI
+      const exportBtn = document.getElementById('exportJsonBtn');
+      const copyBtn = document.getElementById('copyJsonBtn');
+      const pickBtn = document.getElementById('pickFileBtn');
+      const importBtn = document.getElementById('importJsonBtn');
+      const fileInput = document.getElementById('importFileInput');
+
+      exportBtn.addEventListener('click', handleExportDownload);
+      copyBtn.addEventListener('click', handleExportCopy);
+      pickBtn.addEventListener('click', function() { fileInput.click(); });
+      fileInput.addEventListener('change', function() {
+        importBtn.disabled = !(fileInput.files && fileInput.files[0]);
+        if (fileInput.files && fileInput.files[0]) {
+          document.getElementById('importResult').textContent = `Selected: ${fileInput.files[0].name}`;
+        }
+      });
+      importBtn.addEventListener('click', function() {
+        if (fileInput.files && fileInput.files[0]) {
+          handleImportFile(fileInput.files[0]);
+          // reset selection so subsequent imports can reselect same file
+          fileInput.value = '';
+          importBtn.disabled = true;
+        }
+      });
+    })();
+  </script>
 </body>
 </html>
