@@ -42,3 +42,9 @@ export async function apiRagUpsert(baseUrl: string, id: string, text: string, me
 	if (!res.ok) throw new Error('rag upsert failed');
 	return res.json();
 }
+
+export async function apiMarketAnalysis(baseUrl: string, payload: { keywords?: string[]; geo?: string }) {
+	const res = await fetch(`${baseUrl}/api/market`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+	if (!res.ok) throw new Error('market analysis failed');
+	return res.json();
+}

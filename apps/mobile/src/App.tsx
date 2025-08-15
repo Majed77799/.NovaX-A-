@@ -3,6 +3,7 @@ import { Platform, SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, 
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import * as Font from 'expo-font';
+import MarketAnalysisScreen from './MarketAnalysis';
 
 const ORB_SIZE = 96;
 
@@ -10,11 +11,14 @@ type Message = { id: string; role: 'user'|'assistant'|'system'; content: string 
 
 type OrbState = 'idle'|'thinking'|'speaking';
 
+type Mode = 'assistant' | 'market';
+
 export default function App() {
 	const [fontLoaded, setFontLoaded] = useState(false);
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [input, setInput] = useState('');
 	const [orb, setOrb] = useState<OrbState>('idle');
+	const [mode, setMode] = useState<Mode>('assistant');
 	const scrollRef = useRef<ScrollView>(null);
 
 	useEffect(() => {
@@ -50,6 +54,10 @@ export default function App() {
 		}
 	}
 
+	if (mode === 'market') {
+		return <MarketAnalysisScreen />;
+	}
+
 	return (
 		<LinearGradient colors={["#F6E7FF","#E9F0FF","#D7F7FF"]} start={{x:0,y:0}} end={{x:1,y:1}} style={{ flex: 1 }}>
 			<SafeAreaView style={{ flex: 1 }}>
@@ -67,6 +75,7 @@ export default function App() {
 							<QuickChip label="Summarize" onPress={() => send('Summarize my day in 3 bullet points.')} />
 							<QuickChip label="Translate" onPress={() => send('Translate the last message to Spanish.')} />
 							<QuickChip label="To‑do" onPress={() => send('Create a to-do list for this week.')} />
+							<QuickChip label="Market" onPress={() => setMode('market')} />
 						</View>
 						<TextInput
 							style={{ flex: 1, paddingHorizontal: 12, paddingVertical: 8, maxHeight: 24*4, fontFamily: fontLoaded ? 'Urbanist' : undefined }}

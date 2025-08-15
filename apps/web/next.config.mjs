@@ -12,7 +12,7 @@ export default withPWA({
 	experimental: {
 		serverActions: { allowedOrigins: ['*'] }
 	},
-	transpilePackages: ['@repo/shared', '@repo/ai', '@repo/api-client'],
+	transpilePackages: ['@repo/shared', '@repo/ai', '@repo/api-client', '@repo/market-analysis'],
 	reactStrictMode: true,
 	eslint: { ignoreDuringBuilds: true },
 	api: { bodyParser: { sizeLimit: '1mb' } },

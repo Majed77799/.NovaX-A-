@@ -1,43 +1,23 @@
-# Ello Perfect Replica (Web + Mobile)
+# Ello Replica Monorepo
 
-Monorepo with Next.js 14 PWA (`apps/web`) and Expo Go app (`apps/mobile`), plus shared packages for AI orchestration and utilities.
-
-## Install
-
-```bash
-npm install
-```
+- apps/web — Next.js web app (APIs)
+- apps/mobile — Expo app
+- packages/* — shared packages
 
 ## Dev
 
-```bash
-# Web
-npm run dev:web
-# Mobile (Expo Go)
-npm run dev:mobile
-```
+- `npm run dev` — run both apps
+- `npm run dev:web` — web only
+- `npm run dev:mobile` — mobile only
 
-Set environment variables: copy `.env.example` to `.env.local` (for web) or your host.
+## Market Analysis (new)
 
-## Build
+- API: `POST /api/market` with `{ keywords?: string[], geo?: string }`
+- Mobile: Open the app and tap the "Market" quick chip to launch the Market Analysis screen. Enter keywords and run analysis. Export PDF from the screen.
+- Env (optional for richer data): set `OPENAI_API_KEY`, `ETSY_API_KEY`, `GUMROAD_ACCESS_TOKEN`, `GUMROAD_SELLER_ID`, `GOOGLE_API_KEY`.
 
-```bash
-npm run build
-```
-
-## Skia vs SVG orb
-- Default: CSS/SVG glow orb for universal parity and 60fps without native modules.
-- Mobile: `@shopify/react-native-skia` can be enabled to render a shader glow orb. We use CSS/SVG fallback by default to avoid Expo Go breakage. Enable Skia in a future iteration for production builds.
-
-## Troubleshooting
-- 429 errors: configure Upstash env for rate limit or unset to disable.
-- SSE not streaming on some hosts: ensure Vercel edge runtime is used and no body buffering middleware.
-- Whisper/STT: requires `OPENAI_API_KEY`.
-- Supabase RAG: create `documents` table with `embedding vector(1536)` and RPC `match_documents`.
-- Stripe: set `STRIPE_SECRET_KEY`, `STRIPE_PRICE_ID`.
-
-## Next steps
-- Add analytics (PostHog or custom) with consent.
-- Add i18n auto-translate on the fly.
-- Add offline IndexedDB caching for messages/templates.
-- Polish animations and orb shader for Skia on mobile builds.
+Testing locally:
+1. Install deps at repo root: `npm install`
+2. Start web: `npm run dev:web` (defaults to `http://localhost:3000`)
+3. In another terminal: `npm run dev:mobile`
+4. In the mobile app, tap "Market" and run analysis. If no keys, you'll still see trends-based results; AI recommendations will use fallback text if no model keys.
