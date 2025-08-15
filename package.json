@@ -1,0 +1,29 @@
+{
+  "name": "unified-app-monorepo",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/web",
+    "apps/mobile"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "postinstall": "npm run prepare -ws || true",
+    "typecheck": "npm run typecheck -w apps/web && npm run typecheck -w apps/mobile",
+    "lint": "eslint --max-warnings=0 --ext .js,.ts,.tsx apps/web apps/mobile",
+    "dev:web": "npm run dev -w apps/web",
+    "dev:mobile": "npm run start -w apps/mobile",
+    "build:web": "npm run build -w apps/web"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.33.0",
+    "eslint": "^9.33.0",
+    "eslint-config-prettier": "^9.1.2",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "typescript": "^5.5.4",
+    "typescript-eslint": "^8.39.1"
+  }
+}
