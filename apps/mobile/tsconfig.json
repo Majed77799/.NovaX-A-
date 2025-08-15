@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "paths": {
+      "@acme/ui": ["../../packages/ui/src"],
+      "@acme/core": ["../../packages/core/src"]
+    }
+  },
+  "include": ["src", "index.js"]
+}

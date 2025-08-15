@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "name": "MobileApp",
+    "slug": "mobile-app",
+    "version": "1.0.0",
+    "plugins": [
+      "expo-blur",
+      "expo-linear-gradient"
+    ],
+    "platforms": ["ios", "android", "web"]
+  }
+}
