@@ -1,0 +1,29 @@
+{
+  "name": "novax",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@9.7.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:all": "turbo run dev --parallel",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "deploy:web": "turbo run deploy:web",
+    "deploy:api": "turbo run deploy:api",
+    "clean": "turbo run clean && rimraf node_modules **/node_modules **/dist **/.turbo",
+    "prepare": "husky install"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.6",
+    "rimraf": "^5.0.5",
+    "husky": "^9.0.11",
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.4",
+    "eslint": "^9.9.0"
+  }
+}

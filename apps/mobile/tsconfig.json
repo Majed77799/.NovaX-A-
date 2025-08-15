@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "types": ["react", "react-native"],
+    "baseUrl": ".",
+    "paths": {
+      "@novax/ai": ["../../packages/ai/src"],
+      "@novax/i18n": ["../../packages/i18n/src"],
+      "@novax/shared": ["../../packages/shared/src"],
+      "@novax/ui": ["../../packages/ui/src"]
+    }
+  },
+  "include": ["**/*.ts", "**/*.tsx"]
+}
