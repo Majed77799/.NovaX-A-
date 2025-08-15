@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Templates Store</title>
+	<style>
+		body { margin: 0; font-family: Arial, sans-serif; background: #0b1833; color: #eef2ff; }
+		header { padding: 16px 20px; background: #0f2040; display: flex; align-items: center; justify-content: space-between; }
+		main { padding: 20px; }
+		.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+		.card { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 14px; }
+		.card h3 { margin: 0 0 6px; font-size: 16px; }
+		.card p { margin: 0 0 8px; color: #b8c7ff; font-size: 13px; min-height: 38px; }
+		.btn { background: linear-gradient(90deg, #6aa7ff, #b26aff); color: #0b1026; border: 0; padding: 10px 14px; border-radius: 999px; cursor: pointer; font-weight: 700; }
+		.tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+		.tab { padding: 8px 12px; border-radius: 8px; cursor: pointer; background: rgba(255,255,255,0.06); }
+		.tab.active { background: rgba(255,255,255,0.16); }
+		.price { font-weight: bold; color: #e6f0ff; }
+		.badge { display: inline-block; padding: 2px 6px; font-size: 11px; background: #6aa7ff; border-radius: 6px; color: #0b1833; margin-left: 6px; }
+		input, button { font-family: inherit; }
+		.controls { display: flex; gap: 8px; align-items: center; }
+	</style>
+</head>
+<body>
+	<header>
+		<div>Templates Store</div>
+		<div class="controls">
+			<input id="email" type="email" placeholder="you@example.com" />
+			<button class="btn" id="signin">Use Email</button>
+		</div>
+	</header>
+	<main>
+		<div class="tabs">
+			<div class="tab active" data-tab="featured">Featured</div>
+			<div class="tab" data-tab="trending">Trending</div>
+			<div class="tab" data-tab="purchased">My Purchases</div>
+			<div class="tab" data-tab="pinned">Pinned</div>
+		</div>
+		<div id="grid" class="grid"></div>
+	</main>
+	<script>
+		const state = { templates: [], purchases: [], tab: 'featured', email: localStorage.getItem('email') || '' };
+		const emailInput = document.getElementById('email');
+		emailInput.value = state.email;
+		document.getElementById('signin').onclick = () => {
+			state.email = emailInput.value.trim();
+			localStorage.setItem('email', state.email);
+			loadPurchases();
+			render();
+		};
+
+		async function loadTemplates() {
+			const res = await fetch('/api/templates/list');
+			const data = await res.json();
+			state.templates = data.templates || [];
+			render();
+		}
+
+		async function loadPurchases() {
+			if (!state.email) return;
+			const res = await fetch(`/api/templates/mine?email=${encodeURIComponent(state.email)}`);
+			const data = await res.json();
+			state.purchases = data.purchases || [];
+			render();
+		}
+
+		function formatPrice(cents) { return cents > 0 ? `$${(cents/100).toFixed(2)}` : 'Free'; }
+
+		function render() {
+			const grid = document.getElementById('grid');
+			let list = [...state.templates];
+			if (state.tab === 'featured') list = list.filter(t => t.featured);
+			if (state.tab === 'trending') list = list.sort((a,b) => (b.trending_score||0)-(a.trending_score||0));
+			if (state.tab === 'purchased') {
+				const purchasedIds = new Set(state.purchases.map(p => p.template_id));
+				list = list.filter(t => purchasedIds.has(t.id));
+			}
+			if (state.tab === 'pinned') list = list.filter(t => t.pinned);
+
+			grid.innerHTML = '';
+			for (const t of list) {
+				const purchased = state.purchases.some(p => p.template_id === t.id);
+				const card = document.createElement('div');
+				card.className = 'card';
+				card.innerHTML = `
+					<h3>${t.title} ${t.badge ? `<span class=badge>${t.badge}</span>`: ''}</h3>
+					<p>${t.description || ''}</p>
+					<div class=price>${formatPrice(t.price_cents)}</div>
+					<div style="margin-top:8px; display:flex; gap:8px;">
+						<button class=btn data-action="${purchased ? 'download':'buy'}" data-id="${t.id}">${purchased ? 'Download' : 'Purchase'}</button>
+					</div>
+				`;
+				card.querySelector('button').onclick = () => onAction(card.querySelector('button').dataset.action, t);
+				grid.appendChild(card);
+			}
+		}
+
+		async function onAction(action, t) {
+			if (!state.email) { alert('Please enter your email first.'); return; }
+			if (action === 'buy') {
+				const resp = await fetch('/api/billing/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ templateId: t.id, email: state.email }) });
+				const data = await resp.json();
+				if (data.provider === 'stripe' && data.url) { window.location.href = data.url; return; }
+				if (data.provider === 'gumroad' && data.url) { window.open(data.url, '_blank'); return; }
+				alert('Checkout unavailable.');
+			}
+			if (action === 'download') {
+				const resp = await fetch(`/api/templates/download?templateId=${encodeURIComponent(t.id)}&email=${encodeURIComponent(state.email)}`);
+				const data = await resp.json();
+				if (data.url) window.open(data.url, '_blank');
+			}
+		}
+
+		window.addEventListener('DOMContentLoaded', () => {
+			for (const el of document.querySelectorAll('.tab')) {
+				el.addEventListener('click', () => { document.querySelector('.tab.active').classList.remove('active'); el.classList.add('active'); state.tab = el.dataset.tab; render(); });
+			}
+			loadTemplates();
+			if (state.email) loadPurchases();
+		});
+	</script>
+</body>
+</html>
