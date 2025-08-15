@@ -3,6 +3,8 @@ import { Platform, SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, 
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import * as Font from 'expo-font';
+import Dashboard from './screens/Dashboard';
+import { recordEvent } from './lib/analytics';
 
 const ORB_SIZE = 96;
 
@@ -15,6 +17,7 @@ export default function App() {
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [input, setInput] = useState('');
 	const [orb, setOrb] = useState<OrbState>('idle');
+	const [screen, setScreen] = useState<'chat'|'dashboard'>('chat');
 	const scrollRef = useRef<ScrollView>(null);
 
 	useEffect(() => {
@@ -31,6 +34,8 @@ export default function App() {
 		setInput('');
 		setOrb('thinking');
 		try {
+			recordEvent({ type: 'ai_user' }).catch(()=>{});
+			fetch(`${process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'}/api/analytics`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ t: 'ai_user' }) }).catch(()=>{});
 			const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'}/api/chat`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: [...messages, userMsg] }) });
 			if (!res.body) { setOrb('idle'); return; }
 			const reader = res.body.getReader();
@@ -45,6 +50,8 @@ export default function App() {
 				assistantMsg = { ...assistantMsg, content: assistantMsg.content + chunk };
 				setMessages(prev => prev.map(m => m.id === assistantMsg.id ? assistantMsg : m));
 			}
+			recordEvent({ type: 'ai_assistant' }).catch(()=>{});
+			fetch(`${process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'}/api/analytics`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ t: 'ai_assistant' }) }).catch(()=>{});
 		} finally {
 			setOrb('idle');
 		}
@@ -53,36 +60,54 @@ export default function App() {
 	return (
 		<LinearGradient colors={["#F6E7FF","#E9F0FF","#D7F7FF"]} start={{x:0,y:0}} end={{x:1,y:1}} style={{ flex: 1 }}>
 			<SafeAreaView style={{ flex: 1 }}>
-				<View style={{ height: ORB_SIZE, width: ORB_SIZE, borderRadius: ORB_SIZE/2, margin: 12, shadowColor: '#7841FF', shadowOpacity: 0.35, shadowRadius: 16, backgroundColor: 'rgba(255,255,255,0.35)', overflow: 'hidden' }} />
-				<ScrollView ref={scrollRef} contentContainerStyle={{ padding: 16, paddingBottom: 140 }}>
-					{messages.map(m => (
-						<View key={m.id} style={{ maxWidth: '80%', alignSelf: m.role === 'assistant' ? 'flex-start' : 'flex-end', backgroundColor: m.role === 'assistant' ? 'rgba(255,255,255,0.5)' : '#fff', paddingHorizontal: 14, paddingVertical: 10, borderRadius: 16, marginBottom: 10, borderWidth: m.role==='assistant'?1:0, borderColor: 'rgba(255,255,255,0.25)' }}>
-							<Text style={{ fontFamily: fontLoaded ? 'Urbanist' : undefined, fontSize: 16, lineHeight: 22 }}>{m.content}</Text>
-						</View>
-					))}
-				</ScrollView>
-				<View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, padding: 16 }}>
-					<View style={{ backgroundColor: '#fff', borderRadius: 999, borderWidth: 1, borderColor: 'rgba(15,18,35,0.08)', padding: 10, flexDirection: 'row', alignItems: 'flex-end', gap: 8, shadowColor: '#101828', shadowOpacity: 0.06, shadowRadius: 20 }}>
-						<View style={{ flexDirection: 'row', gap: 6 }}>
-							<QuickChip label="Summarize" onPress={() => send('Summarize my day in 3 bullet points.')} />
-							<QuickChip label="Translate" onPress={() => send('Translate the last message to Spanish.')} />
-							<QuickChip label="To‑do" onPress={() => send('Create a to-do list for this week.')} />
-						</View>
-						<TextInput
-							style={{ flex: 1, paddingHorizontal: 12, paddingVertical: 8, maxHeight: 24*4, fontFamily: fontLoaded ? 'Urbanist' : undefined }}
-							value={input}
-							multiline
-							onChangeText={setInput}
-							onSubmitEditing={() => send(input)}
-							placeholder="Message Ello"
-						/>
-						<TouchableOpacity onPress={() => send(input)} activeOpacity={0.8} style={{ paddingHorizontal: 12, paddingVertical: 8 }}>
-							<Text>➤</Text>
-						</TouchableOpacity>
-					</View>
+				<View style={{ flexDirection: 'row', gap: 8, padding: 12 }}>
+					<TabButton label="Chat" selected={screen==='chat'} onPress={() => setScreen('chat')} />
+					<TabButton label="Dashboard" selected={screen==='dashboard'} onPress={() => setScreen('dashboard')} />
 				</View>
+				{screen === 'dashboard' ? (
+					<Dashboard />
+				) : (
+					<>
+						<View style={{ height: ORB_SIZE, width: ORB_SIZE, borderRadius: ORB_SIZE/2, margin: 12, shadowColor: '#7841FF', shadowOpacity: 0.35, shadowRadius: 16, backgroundColor: 'rgba(255,255,255,0.35)', overflow: 'hidden' }} />
+						<ScrollView ref={scrollRef} contentContainerStyle={{ padding: 16, paddingBottom: 140 }}>
+							{messages.map(m => (
+								<View key={m.id} style={{ maxWidth: '80%', alignSelf: m.role === 'assistant' ? 'flex-start' : 'flex-end', backgroundColor: m.role === 'assistant' ? 'rgba(255,255,255,0.5)' : '#fff', paddingHorizontal: 14, paddingVertical: 10, borderRadius: 16, marginBottom: 10, borderWidth: m.role==='assistant'?1:0, borderColor: 'rgba(255,255,255,0.25)' }}>
+								<Text style={{ fontFamily: fontLoaded ? 'Urbanist' : undefined, fontSize: 16, lineHeight: 22 }}>{m.content}</Text>
+								</View>
+							))}
+						</ScrollView>
+						<View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, padding: 16 }}>
+							<View style={{ backgroundColor: '#fff', borderRadius: 999, borderWidth: 1, borderColor: 'rgba(15,18,35,0.08)', padding: 10, flexDirection: 'row', alignItems: 'flex-end', gap: 8, shadowColor: '#101828', shadowOpacity: 0.06, shadowRadius: 20 }}>
+								<View style={{ flexDirection: 'row', gap: 6 }}>
+									<QuickChip label="Summarize" onPress={() => send('Summarize my day in 3 bullet points.')} />
+									<QuickChip label="Translate" onPress={() => send('Translate the last message to Spanish.')} />
+									<QuickChip label="To‑do" onPress={() => send('Create a to-do list for this week.')} />
+								</View>
+								<TextInput
+									style={{ flex: 1, paddingHorizontal: 12, paddingVertical: 8, maxHeight: 24*4, fontFamily: fontLoaded ? 'Urbanist' : undefined }}
+									value={input}
+									multiline
+									onChangeText={setInput}
+									onSubmitEditing={() => send(input)}
+									placeholder="Message Ello"
+								/>
+								<TouchableOpacity onPress={() => send(input)} activeOpacity={0.8} style={{ paddingHorizontal: 12, paddingVertical: 8 }}>
+									<Text>➤</Text>
+								</TouchableOpacity>
+							</View>
+						</View>
+					</>
+				)}
 			</SafeAreaView>
 		</LinearGradient>
+	);
+}
+
+function TabButton({ label, selected, onPress }: { label: string; selected: boolean; onPress: () => void }) {
+	return (
+		<TouchableOpacity onPress={onPress} activeOpacity={0.8} style={{ backgroundColor: selected ? '#fff' : 'rgba(255,255,255,0.7)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.5)', borderRadius: 999, paddingHorizontal: 12, paddingVertical: 8 }}>
+			<Text style={{ fontSize: 14 }}>{label}</Text>
+		</TouchableOpacity>
 	);
 }
 

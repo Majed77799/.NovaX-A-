@@ -1,8 +1,9 @@
 {
-  "extends": "../../tsconfig.base.json",
-  "compilerOptions": {
-    "jsx": "react-jsx",
-    "noEmit": true
-  },
-  "include": ["**/*.ts", "**/*.tsx"]
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"jsx": "react-jsx",
+		"types": ["jest", "react", "react-native"],
+		"baseUrl": "."
+	},
+	"include": ["src", "jest.setup.ts", "jest.config.js"]
 }
