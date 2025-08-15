@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Multilingual Chat (EN/AR)</title>
+		<style>
+			body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji'; margin: 0; padding: 0; background: #0b0f14; color: #e6edf3; }
+			.container { max-width: 900px; margin: 0 auto; padding: 24px; }
+			h1 { font-size: 20px; margin: 0 0 16px; }
+			.row { display: flex; gap: 12px; margin-bottom: 12px; }
+			input, select, button, textarea { background: #0e1621; color: #e6edf3; border: 1px solid #1c2a3a; border-radius: 8px; padding: 10px 12px; }
+			textarea { width: 100%; min-height: 80px; resize: vertical; }
+			button { cursor: pointer; }
+			.message { border: 1px solid #1c2a3a; background: #0e1621; border-radius: 10px; padding: 12px; margin: 12px 0; }
+			.small { color: #9fb3c8; font-size: 12px; }
+			.translated { color: #bcd5ff; }
+			.original { color: #9fb3c8; }
+			.meta { display: flex; gap: 8px; align-items: center; }
+			.toggle { border: none; background: transparent; color: #8ab4f8; padding: 0; font-size: 12px; cursor: pointer; }
+			.lang-badge { padding: 2px 6px; border-radius: 6px; background: #14202c; border: 1px solid #20354d; font-size: 12px; }
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<h1>Multilingual Chat (EN/AR + auto)</h1>
+			<div class="row">
+				<label>
+					<span class="small">Your language</span><br />
+					<select id="lang">
+						<option value="auto">Auto (detect)</option>
+						<option value="en">English</option>
+						<option value="ar">Arabic</option>
+					</select>
+				</label>
+			</div>
+			<div class="row">
+				<textarea id="text" placeholder="Type a message..."></textarea>
+			</div>
+			<div class="row">
+				<button id="send">Send</button>
+			</div>
+			<div id="messages"></div>
+		</div>
+		<script>
+			const apiBase = (location.origin.replace(/:\\d+$/, ':3001'));
+			const messagesEl = document.getElementById('messages');
+			const sendBtn = document.getElementById('send');
+			const textEl = document.getElementById('text');
+			const langEl = document.getElementById('lang');
+
+			const messages = [];
+
+			function renderMessages() {
+				messagesEl.innerHTML = '';
+				for (const msg of messages) {
+					const wrapper = document.createElement('div');
+					wrapper.className = 'message';
+
+					const meta = document.createElement('div');
+					meta.className = 'meta';
+					const role = document.createElement('span');
+					role.className = 'lang-badge';
+					role.textContent = msg.role;
+					const badge = document.createElement('span');
+					badge.className = 'lang-badge';
+					badge.textContent = msg.lang.toUpperCase();
+					meta.appendChild(role);
+					meta.appendChild(badge);
+
+					const content = document.createElement('div');
+					const translated = document.createElement('div');
+					translated.className = 'translated';
+					translated.dir = (msg.translated ? msg.translated.lang : msg.lang) === 'ar' ? 'rtl' : 'ltr';
+					translated.textContent = msg.translated ? msg.translated.text : msg.text;
+					content.appendChild(translated);
+
+					const original = document.createElement('div');
+					original.className = 'original small';
+					original.dir = msg.lang === 'ar' ? 'rtl' : 'ltr';
+					original.style.display = 'none';
+					original.textContent = msg.text;
+					content.appendChild(original);
+
+					const toggle = document.createElement('button');
+					toggle.className = 'toggle';
+					toggle.textContent = 'Show original';
+					toggle.addEventListener('click', () => {
+						if (original.style.display === 'none') {
+							original.style.display = 'block';
+							toggle.textContent = 'Hide original';
+						} else {
+							original.style.display = 'none';
+							toggle.textContent = 'Show original';
+						}
+					});
+
+					wrapper.appendChild(meta);
+					wrapper.appendChild(content);
+					wrapper.appendChild(toggle);
+					messagesEl.appendChild(wrapper);
+				}
+			}
+
+			sendBtn.addEventListener('click', async () => {
+				const text = textEl.value.trim();
+				if (!text) return;
+				const lang = langEl.value;
+				textEl.value = '';
+
+				try {
+					const resp = await fetch(`${apiBase}/messages`, {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ role: 'user', lang, text })
+					});
+					const data = await resp.json();
+					if (!resp.ok) throw new Error(data.error || 'Failed');
+					messages.push(data.message);
+					renderMessages();
+				} catch (err) {
+					alert(err.message || 'Error');
+				}
+			});
+		</script>
+	</body>
+</html>
