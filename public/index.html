@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Privacy-First Analytics & Feature Flags</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+	<style>
+		:root { --bg:#0b0f14; --card:#121822; --text:#e5eef8; --muted:#9db3c7; --accent:#4cc38a; --border:#213040 }
+		*{ box-sizing:border-box }
+		html,body{ height:100% }
+		body{ margin:0; background:var(--bg); color:var(--text); font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif }
+		.container{ max-width:800px; margin:40px auto; padding:0 16px }
+		.card{ background:var(--card); border:1px solid var(--border); border-radius:14px; padding:20px }
+		h1{ font-size:22px; margin:0 0 16px }
+		h2{ font-size:16px; margin:24px 0 8px; color:var(--muted); text-transform:uppercase; letter-spacing:.08em }
+		.row{ display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-top:1px solid var(--border) }
+		.row:first-of-type{ border-top:none }
+		label{ display:flex; flex-direction:column; gap:4px }
+		label .title{ font-weight:600 }
+		label .desc{ color:var(--muted); font-size:13px }
+		.toggle{ position:relative; width:52px; height:30px; background:#2b3a4a; border-radius:999px; cursor:pointer; transition:background .2s ease }
+		.toggle.on{ background:var(--accent) }
+		.knob{ position:absolute; top:3px; left:3px; width:24px; height:24px; background:#0b0f14; border-radius:50%; transition:left .2s ease }
+		.toggle.on .knob{ left:25px }
+		.small{ color:var(--muted); font-size:12px }
+		.footer{ margin-top:16px; display:flex; gap:12px; align-items:center }
+		.button{ background:#1a2431; color:var(--text); border:1px solid var(--border); padding:8px 12px; border-radius:10px; cursor:pointer }
+		.code{ background:#0e141c; border:1px solid var(--border); border-radius:10px; padding:12px; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:12px; color:#c4d2df; overflow:auto }
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="card">
+			<h1>Settings</h1>
+			<div class="row">
+				<label>
+					<span class="title">Labs</span>
+					<span class="desc">Enable experimental features on this device. This only affects your local experience.</span>
+				</label>
+				<div id="labsToggle" class="toggle" role="switch" aria-checked="false" tabindex="0"><div class="knob"></div></div>
+			</div>
+			<div class="footer">
+				<button id="refreshFlags" class="button">Refresh Flags</button>
+				<span class="small">Flags are cached locally with TTL. Telemetry counts only, no PII.</span>
+			</div>
+		</div>
+
+		<div style="height:16px"></div>
+
+		<div class="card">
+			<h2>Debug</h2>
+			<div class="row"><label><span class="title">Feature Flags</span><span class="desc">Latest resolved flags</span></label></div>
+			<pre id="flagsOut" class="code">loading…</pre>
+		</div>
+	</div>
+	<script src="/app.js" type="module"></script>
+</body>
+</html>
