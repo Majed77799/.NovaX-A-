@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Terms & Conditions — NovaX AI</title>
+  <meta name="theme-color" content="#0b1833">
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; background: linear-gradient(180deg, #0b1833, #1a0b2e); color: #e8eeff; }
+    .container { max-width: 800px; margin: 0 auto; padding: 24px; }
+    a { color: #cfe1ff; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .card { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 20px; }
+    .back { display: inline-block; margin: 16px 0; }
+    .content h1, .content h2, .content h3 { color: #ffffff; }
+    .content p, .content li { color: #c5d3ff; line-height: 1.6; }
+    .content code { background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 6px; }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <a class="back" href="/">← Back</a>
+    <div class="card">
+      <div id="content" class="content">Loading…</div>
+    </div>
+  </div>
+  <script>
+    fetch('/terms.md')
+      .then(r => r.text())
+      .then(md => { document.getElementById('content').innerHTML = marked.parse(md); })
+      .catch(() => { document.getElementById('content').textContent = 'Failed to load content.'; });
+  </script>
+</body>
+</html>
