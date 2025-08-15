@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Platform, SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
-import * as Font from 'expo-font';
 import { useFonts, Urbanist_400Regular } from '@expo-google-fonts/urbanist';
 
 const ORB_SIZE = 96;
@@ -16,8 +15,7 @@ type Summary = { range: { start: string; end: string }; totalEvents: number; act
 type Screen = 'chat' | 'analytics';
 
 export default function App() {
-	const [fontLoaded, setFontLoaded] = useState(false);
-	const [googleLoaded] = useFonts({ Urbanist_400Regular });
+	const [fontsLoaded] = useFonts({ Urbanist_400Regular });
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [input, setInput] = useState('');
 	const [orb, setOrb] = useState<OrbState>('idle');
@@ -25,16 +23,11 @@ export default function App() {
 	const [screen, setScreen] = useState<Screen>('chat');
 	const [summary, setSummary] = useState<Summary | null>(null);
 
-	useEffect(() => {
-		// try local variable font if present; ignore errors
-		Font.loadAsync({ Urbanist: require('./assets/Urbanist-VariableFont_wght.ttf') }).then(() => setFontLoaded(true)).catch(() => setFontLoaded(false));
-	}, []);
-
 	useEffect(() => { scrollRef.current?.scrollToEnd({ animated: true }); }, [messages.length]);
 
 	useEffect(() => { if (screen === 'analytics') { (async () => {
 		try {
-			const base = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+			const base = (process.env.EXPO_PUBLIC_APP_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000');
 			const res = await fetch(`${base}/api/analytics?days=14`);
 			if (res.ok) setSummary(await res.json());
 		} catch {}
@@ -48,7 +41,10 @@ export default function App() {
 		setInput('');
 		setOrb('thinking');
 		try {
-			const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'}/api/chat`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: [...messages, userMsg] }) });
+			// non-blocking analytics event
+			try { const base = (process.env.EXPO_PUBLIC_APP_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'); fetch(`${base}/api/analytics`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ t: 'message', product: 'chat' }) }); } catch {}
+			const chatBase = (process.env.EXPO_PUBLIC_APP_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000');
+			const res = await fetch(`${chatBase}/api/chat`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: [...messages, userMsg] }) });
 			if (!res.body) { setOrb('idle'); return; }
 			const reader = res.body.getReader();
 			const decoder = new TextDecoder();
@@ -67,7 +63,7 @@ export default function App() {
 		}
 	}
 
-	const fontFamily = fontLoaded ? 'Urbanist' : (googleLoaded ? 'Urbanist_400Regular' : undefined);
+	const fontFamily = fontsLoaded ? 'Urbanist_400Regular' : undefined;
 
 	return (
 		<LinearGradient colors={["#F6E7FF","#E9F0FF","#D7F7FF"]} start={{x:0,y:0}} end={{x:1,y:1}} style={{ flex: 1 }}>
