@@ -1,0 +1,14 @@
+node_modules
+.npm
+npm-debug.log*
+.next
+out
+dist
+build
+.expo
+.expo-shared
+coverage
+.DS_Store
+.env*
+apps/web/.next
+apps/web/.vercel

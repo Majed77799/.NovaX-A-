@@ -1,0 +1,14 @@
+{
+	"expo": {
+		"name": "Unified App",
+		"slug": "unified-app",
+		"scheme": "unifiedapp",
+		"version": "1.0.0",
+		"orientation": "portrait",
+		"platforms": ["ios", "android"],
+		"newArchEnabled": true,
+		"experiments": { "typedRoutes": false },
+		"ios": { "supportsTablet": true },
+		"android": { "package": "com.unifiedapp" }
+	}
+}
