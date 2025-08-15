@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 
 export default function Explore() {
 	const [items, setItems] = useState<{ id: string; title: string; prompt: string }[]>([]);
+
 	useEffect(() => { (async () => {
 		try {
 			const local = await import('./templates.json');
@@ -11,6 +12,9 @@ export default function Explore() {
 			setItems(prev => [...prev, ...remote]);
 		} catch {}
 	})() }, []);
+
+	useEffect(() => { fetch('/api/analytics', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ t: 'pageview', product: 'explore' }) }).catch(()=>{}); }, []);
+
 	return (
 		<div className="container" style={{ paddingTop: 24 }}>
 			<h2>Explore</h2>

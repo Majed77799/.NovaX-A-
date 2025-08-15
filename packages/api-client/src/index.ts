@@ -42,3 +42,21 @@ export async function apiRagUpsert(baseUrl: string, id: string, text: string, me
 	if (!res.ok) throw new Error('rag upsert failed');
 	return res.json();
 }
+
+export async function apiAnalyticsSummary(baseUrl: string, days = 14) {
+	const res = await fetch(`${baseUrl}/api/analytics?days=${days}`, { cache: 'no-store' });
+	if (!res.ok) throw new Error('analytics summary failed');
+	return res.json();
+}
+
+export async function apiAnalyticsProducts(baseUrl: string, days = 14) {
+	const res = await fetch(`${baseUrl}/api/analytics/products?days=${days}`, { cache: 'no-store' });
+	if (!res.ok) throw new Error('analytics products failed');
+	return res.json();
+}
+
+export async function apiAnalyticsPredict(baseUrl: string, days = 14, horizon = 7) {
+	const res = await fetch(`${baseUrl}/api/analytics/predict?days=${days}&horizon=${horizon}`, { cache: 'no-store' });
+	if (!res.ok) throw new Error('analytics predict failed');
+	return res.json();
+}

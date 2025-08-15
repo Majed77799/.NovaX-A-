@@ -30,3 +30,34 @@ export function hashAnonymousId(input: string) {
 	}
 	return `u_${Math.abs(hash)}`;
 }
+
+// Analytics shared types
+export type DateKey = string; // YYYY-MM-DD (UTC)
+export type AnalyticsEvent = { t: string; product?: string; value?: number; ts?: number };
+export type TimeseriesPoint = { date: DateKey; value: number };
+export type AnalyticsSummary = {
+	range: { start: DateKey; end: DateKey };
+	totalEvents: number;
+	activeProducts: number;
+	byType: { type: string; total: number }[];
+	timeseries: TimeseriesPoint[];
+	previousTotal?: number;
+	changePct?: number;
+};
+
+export type ProductTrend = { product: string; total: number; timeseries: TimeseriesPoint[] };
+export type PredictionPoint = { date: DateKey; value: number; kind: 'actual'|'predicted' };
+export type PredictionResponse = { basis: 'linear'|'avg'|'none'; horizon: number; series: PredictionPoint[] };
+
+export function formatDateUTC(date: Date): DateKey {
+	const y = date.getUTCFullYear();
+	const m = `${date.getUTCMonth() + 1}`.padStart(2, '0');
+	const d = `${date.getUTCDate()}`.padStart(2, '0');
+	return `${y}-${m}-${d}`;
+}
+
+export function addDaysUTC(date: Date, days: number): Date {
+	const copy = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+	copy.setUTCDate(copy.getUTCDate() + days);
+	return copy;
+}

@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
 			const systemMsg = { role: 'system' as const, content: `You are Ello. Always reply in ${userLang}. Keep responses concise and helpful.` };
 			await generateStreaming({
 				messages: [systemMsg, ...body.messages.map(m => ({ role: m.role, content: m.content }))],
-				onToken: async (token) => {
+				onToken: async (token: string) => {
 					await writer.write(encoder.encode(token));
 				},
 				signal

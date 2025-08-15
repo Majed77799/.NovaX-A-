@@ -34,7 +34,7 @@ export default function Page() {
 		abortRef.current?.abort();
 		const controller = new AbortController();
 		abortRef.current = controller;
-		fetch('/api/analytics', { method: 'POST', body: JSON.stringify({ t: 'message', len: text.length }), headers: { 'Content-Type': 'application/json' } }).catch(()=>{});
+		fetch('/api/analytics', { method: 'POST', body: JSON.stringify({ t: 'message', len: text.length, product: 'chat' }), headers: { 'Content-Type': 'application/json' } }).catch(()=>{});
 		const res = await fetch('/api/chat', { method: 'POST', body: JSON.stringify({ messages: [...messages, userMsg] }), headers: { 'Content-Type': 'application/json' }, signal: controller.signal });
 		if (!res.ok || !res.body) { setOrb('idle'); return; }
 		const reader = res.body.getReader();
@@ -57,6 +57,7 @@ export default function Page() {
 		if (!last) return;
 		setOrb('speaking');
 		try {
+			fetch('/api/analytics', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ t: 'tts', product: 'chat' }) }).catch(()=>{});
 			const res = await fetch('/api/tts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: last.content }) });
 			const buf = await res.arrayBuffer();
 			const blob = new Blob([buf], { type: 'audio/mpeg' });
@@ -70,6 +71,9 @@ export default function Page() {
 	return (
 		<div className="container">
 			<div className={clsx('orb', orb)} aria-label={`assistant ${orb}`} />
+			<div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: 6 }}>
+				<a href="/analytics" className="quick-chip btn" aria-label="Open Market Analytics">Analytics</a>
+			</div>
 			<div className="chat" ref={listRef}>
 				{messages.map(m => (
 					<div key={m.id} className={clsx('bubble', m.role === 'assistant' ? 'assistant' : 'user')}>{m.content}</div>
