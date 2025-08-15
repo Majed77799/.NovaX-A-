@@ -95,10 +95,50 @@
     footer a:hover {
       text-decoration: underline;
     }
+    .banner {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      padding: 10px 16px;
+      background: #ffb74d;
+      color: #0b1026;
+      font-weight: bold;
+      border-bottom: 1px solid rgba(0,0,0,0.15);
+    }
+    .hidden { display: none; }
+    .empty-state {
+      padding: 16px;
+      color: #b9c2e6;
+    }
+    .muted { color: #9aa6d1; font-size: 12px; }
+    .bar {
+      position: relative;
+      height: 24px;
+      margin: 8px 0;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, #6aa7ff, #b26aff);
+    }
+    .bar-label {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 12px;
+      color: #0b1026;
+      mix-blend-mode: lighten;
+    }
   </style>
 </head>
 <body>
   <header>NovaX AI</header>
+  <div id="offlineBanner" class="banner hidden">You are offline — showing last cached snapshot.</div>
 
   <h1>Effortless Conversations</h1>
   <p class="sub">Powerful Outcomes.</p>
@@ -114,6 +154,15 @@
       <h3>Your Daily Planner</h3>
       <p>Automate routine tasks with ease.</p>
     </div>
+    <div class="card">
+      <h3>Snapshot</h3>
+      <p class="sub" style="font-size: 12px; margin: 0 0 8px;">Latest data with graceful fallbacks</p>
+      <div id="snapshotContent" style="text-align: left;"></div>
+    </div>
+    <div class="card">
+      <h3>Chart</h3>
+      <div id="chartContent"></div>
+    </div>
   </div>
 
   <div class="cta">
@@ -124,5 +173,140 @@
     <a href="#">Privacy Policy</a> •
     <a href="#">Terms and Conditions</a>
   </footer>
+  <script>
+  (function() {
+    const SNAPSHOT_URL = '/api/snapshot';
+    const CHART_URL = '/api/chart';
+    const SNAPSHOT_CACHE_KEY = 'last_snapshot_v1';
+
+    function fetchWithTimeout(url, options = {}, timeoutMs = 6000) {
+      const controller = new AbortController();
+      const id = setTimeout(() => controller.abort(), timeoutMs);
+      return fetch(url, { ...options, signal: controller.signal })
+        .finally(() => clearTimeout(id));
+    }
+
+    function updateOnlineBanner(message, show) {
+      const banner = document.getElementById('offlineBanner');
+      if (!banner) return;
+      if (message) banner.textContent = message;
+      if (show) banner.classList.remove('hidden');
+      else banner.classList.add('hidden');
+    }
+
+    function renderSnapshot(data) {
+      const el = document.getElementById('snapshotContent');
+      if (!el) return;
+      if (!data) {
+        el.innerHTML = '<div class="empty-state">No snapshot available.</div>';
+        return;
+      }
+      const predictions = Array.isArray(data.predictions) ? data.predictions : [];
+      if (!predictions.length) {
+        el.innerHTML = '<div class="empty-state">No predictions.</div>';
+        return;
+      }
+      const list = predictions.map(function(p) {
+        const hasConfidence = typeof p.confidence === 'number';
+        const confidenceText = hasConfidence ? ' — ' + Math.round(p.confidence * 100) + '%' : '';
+        const label = p.label || p.name || 'Item';
+        return '<li>' + label + confidenceText + '</li>';
+      }).join('');
+      const anyConfidence = predictions.some(function(p) { return typeof p.confidence === 'number'; });
+      const note = anyConfidence ? '' : '<div class="muted">Confidence unavailable</div>';
+      el.innerHTML = '<ul style="text-align: left; padding-left: 18px; margin: 0 0 8px;">' + list + '</ul>' + note;
+    }
+
+    async function loadSnapshot() {
+      try {
+        const res = await fetchWithTimeout(SNAPSHOT_URL, {}, 6000);
+        if (!res.ok) throw new Error('Bad status');
+        const data = await res.json();
+        try {
+          localStorage.setItem(SNAPSHOT_CACHE_KEY, JSON.stringify({ ts: Date.now(), data: data }));
+        } catch (e) {}
+        renderSnapshot(data);
+        updateOnlineBanner('', false);
+      } catch (err) {
+        try {
+          const cached = localStorage.getItem(SNAPSHOT_CACHE_KEY);
+          if (cached) {
+            const parsed = JSON.parse(cached);
+            renderSnapshot(parsed.data);
+            updateOnlineBanner('You are offline or the server is unreachable — showing last cached snapshot.', true);
+          } else {
+            renderSnapshot(null);
+            updateOnlineBanner('Cannot reach the server and no cached data is available.', true);
+          }
+        } catch (e) {
+          renderSnapshot(null);
+          updateOnlineBanner('Cannot reach the server and no cached data is available.', true);
+        }
+      }
+    }
+
+    function renderChart(data) {
+      const container = document.getElementById('chartContent');
+      if (!container) return;
+      const items = Array.isArray(data) ? data : [];
+      if (!items.length) {
+        renderEmptyChart(false);
+        return;
+      }
+      const normalized = items.map(function(item) {
+        if (typeof item === 'number') return { label: '', value: item };
+        return { label: item.label || item.name || '', value: typeof item.value === 'number' ? item.value : 0 };
+      });
+      const max = Math.max(1, ...normalized.map(function(d) { return d.value; }));
+      container.innerHTML = normalized.map(function(d) {
+        const widthPct = Math.round((d.value / max) * 100);
+        return (
+          '<div class="bar">' +
+            '<span class="bar-fill" style="width:' + widthPct + '%"></span>' +
+            '<span class="bar-label">' + (d.label ? d.label + ' ' : '') + d.value + '</span>' +
+          '</div>'
+        );
+      }).join('');
+    }
+
+    function renderEmptyChart(canRetry) {
+      const container = document.getElementById('chartContent');
+      if (!container) return;
+      container.innerHTML = (
+        '<div class="empty-state">No data to display.' +
+        (canRetry ? ' <button id="retryChartBtn" class="btn" style="padding: 8px 14px; font-size: 14px;">Retry</button>' : '') +
+        '</div>'
+      );
+      const btn = document.getElementById('retryChartBtn');
+      if (btn) btn.addEventListener('click', loadChart);
+    }
+
+    async function loadChart() {
+      const container = document.getElementById('chartContent');
+      if (container) container.innerHTML = '<div class="muted">Loading…</div>';
+      try {
+        const res = await fetchWithTimeout(CHART_URL, {}, 6000);
+        if (!res.ok) throw new Error('Bad status');
+        const data = await res.json();
+        if (!Array.isArray(data) || data.length === 0) {
+          renderEmptyChart(true);
+          return;
+        }
+        renderChart(data);
+      } catch (e) {
+        renderEmptyChart(true);
+      }
+    }
+
+    window.addEventListener('online', function() { updateOnlineBanner('', false); });
+    window.addEventListener('offline', function() { updateOnlineBanner('You are offline — showing last cached snapshot.', true); });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      if (!navigator.onLine) updateOnlineBanner('You are offline — showing last cached snapshot.', true);
+      loadSnapshot();
+      loadChart();
+    });
+  })();
+  </script>
 </body>
 </html>
