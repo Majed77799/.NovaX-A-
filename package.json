@@ -2,14 +2,16 @@
   "name": "ello-replica-monorepo",
   "private": true,
   "version": "0.1.0",
+  "packageManager": "npm@10.9.2",
   "workspaces": [
     "apps/*",
     "packages/*"
   ],
   "scripts": {
     "dev": "turbo run dev --parallel",
-    "dev:web": "turbo run dev --filter=web",
+    "dev:web": "turbo run dev --filter=web -- --port 3001",
     "dev:mobile": "turbo run dev --filter=mobile",
+    "dev:api": "npm run -w apps/web dev -- --port 3000",
     "build": "turbo run build",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
