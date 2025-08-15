@@ -1,0 +1,14 @@
+[
+  {
+    "id": 1,
+    "author": "system",
+    "content": "Welcome to NovaX AI",
+    "created_at": "2025-01-01T00:00:00Z"
+  },
+  {
+    "id": 2,
+    "author": "user",
+    "content": "Hello world",
+    "created_at": "2025-01-02T12:34:56Z"
+  }
+]
