@@ -13,5 +13,5 @@ export async function POST(req: NextRequest) {
 	const openai = new OpenAI({ apiKey: key });
 	const result = await openai.audio.speech.create({ model: 'gpt-4o-mini-tts', voice, input: text });
 	const arrayBuffer = await result.arrayBuffer();
-	return new Response(arrayBuffer, { headers: { 'Content-Type': 'audio/mpeg' } });
+	return new Response(arrayBuffer, { headers: { 'Content-Type': 'audio/mpeg', 'Cache-Control': 'public, max-age=31536000, immutable' } });
 }

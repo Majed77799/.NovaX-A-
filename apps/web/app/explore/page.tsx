@@ -7,7 +7,7 @@ export default function Explore() {
 		try {
 			const local = await import('./templates.json');
 			setItems(local.default);
-			const remote = await fetch('https://raw.githubusercontent.com/your/repo/main/templates.json').then(r => r.ok ? r.json() : []);
+			const remote = await fetch('https://raw.githubusercontent.com/your/repo/main/templates.json', { cache: 'force-cache', next: { revalidate: 3600 } }).then(r => r.ok ? r.json() : []);
 			setItems(prev => [...prev, ...remote]);
 		} catch {}
 	})() }, []);

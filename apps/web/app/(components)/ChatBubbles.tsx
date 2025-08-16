@@ -4,7 +4,7 @@ import clsx from 'clsx';
 
 export function ChatBubbles({ items }: { items: ChatMessage[] }) {
 	return (
-		<div className="chat">
+		<div className="chat" role="log" aria-live="polite" aria-relevant="additions">
 			{items.map(m => {
 				const lang = m.language ?? detectLanguage(m.content);
 				const dir = isRTL(lang) ? 'rtl' : 'ltr';

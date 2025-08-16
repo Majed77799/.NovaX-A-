@@ -74,7 +74,7 @@ export default function App() {
 							multiline
 							onChangeText={setInput}
 							onSubmitEditing={() => send(input)}
-							placeholder="Message Ello"
+							placeholder="Message NovaX"
 						/>
 						<TouchableOpacity onPress={() => send(input)} activeOpacity={0.8} style={{ paddingHorizontal: 12, paddingVertical: 8 }}>
 							<Text>➤</Text>

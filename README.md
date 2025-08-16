@@ -1,4 +1,4 @@
-# Ello Perfect Replica (Web + Mobile)
+# NovaX (Web + Mobile)
 
 Monorepo with Next.js 14 PWA (`apps/web`) and Expo Go app (`apps/mobile`), plus shared packages for AI orchestration and utilities.
 
