@@ -1,0 +1,64 @@
+version: "3.9"
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  ai-engine:
+    build: ./services/ai-engine
+    environment:
+      - PORT=3001
+      - REDIS_URL=redis://redis:6379
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    ports:
+      - "3001:3001"
+    depends_on:
+      - redis
+
+  marketplace:
+    build: ./services/marketplace
+    environment:
+      - PORT=3002
+    ports:
+      - "3002:3002"
+
+  payment:
+    build: ./services/payment
+    environment:
+      - PORT=3003
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - PAYPAL_MODE=sandbox
+      - PAYPAL_CLIENT_ID=${PAYPAL_CLIENT_ID}
+      - PAYPAL_CLIENT_SECRET=${PAYPAL_CLIENT_SECRET}
+    ports:
+      - "3003:3003"
+
+  globalization:
+    build: ./services/globalization
+    environment:
+      - PORT=3004
+    ports:
+      - "3004:3004"
+
+  security:
+    build: ./services/security
+    environment:
+      - PORT=3005
+      - JWT_SECRET=${JWT_SECRET:-dev_secret}
+    ports:
+      - "3005:3005"
+
+  community:
+    build: ./services/community
+    environment:
+      - PORT=3006
+    ports:
+      - "3006:3006"
+
+  analytics:
+    build: ./services/analytics
+    environment:
+      - PORT=3007
+    ports:
+      - "3007:3007"

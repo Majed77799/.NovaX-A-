@@ -1,23 +1,26 @@
 {
-  "name": "ello-replica-monorepo",
+  "name": "novax",
   "private": true,
   "version": "0.1.0",
+  "description": "NovaX monorepo for microservices, shared libraries, and infrastructure",
   "workspaces": [
-    "apps/*",
-    "packages/*"
+    "services/*",
+    "libs/*"
   ],
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
-    "dev": "turbo run dev --parallel",
-    "dev:web": "turbo run dev --filter=web",
-    "dev:mobile": "turbo run dev --filter=mobile",
-    "build": "turbo run build",
-    "lint": "turbo run lint",
-    "typecheck": "turbo run typecheck",
-    "format": "turbo run format"
+    "build": "npm run -ws --if-present build",
+    "dev": "npm run -ws --if-present dev",
+    "start": "npm run -ws --if-present start",
+    "lint": "npm run -ws --if-present lint",
+    "typecheck": "npm run -ws --if-present typecheck"
   },
-  "devDependencies": {
-    "turbo": "^2.0.3",
-    "typescript": "^5.4.5"
+  "repository": {
+    "type": "git",
+    "url": "git+https://example.com/novax.git"
   },
-  "packageManager": "npm@10.9.2"
+  "author": "NovaX",
+  "license": "MIT"
 }

@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: globalization
+  labels:
+    app: globalization
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: globalization
+  template:
+    metadata:
+      labels:
+        app: globalization
+    spec:
+      containers:
+        - name: globalization
+          image: novax/globalization:latest
+          ports:
+            - containerPort: 3004
+          env:
+            - name: PORT
+              value: "3004"
+          readinessProbe:
+            httpGet:
+              path: /api/globalization/health
+              port: 3004
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/globalization/health
+              port: 3004
+            initialDelaySeconds: 15
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: globalization
+spec:
+  selector:
+    app: globalization
+  ports:
+    - name: http
+      port: 80
+      targetPort: 3004

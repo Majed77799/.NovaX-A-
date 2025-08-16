@@ -1,0 +1,12 @@
+node_modules
+npm-debug.log
+Dockerfile
+dist
+.git
+.github
+.vscode
+.gitignore
+.env
+.env.*
+**/coverage
+**/.turbo
