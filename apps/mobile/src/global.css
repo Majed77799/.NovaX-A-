@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+	.glass { @apply bg-white/60 border border-white/25 backdrop-blur-lg; }
+	.btn { @apply active:scale-95 transition-transform; }
+	.card { @apply rounded-2xl bg-white/70 border border-white/25 shadow; }
+}
