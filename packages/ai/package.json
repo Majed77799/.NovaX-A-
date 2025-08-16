@@ -4,7 +4,9 @@
   "private": true,
   "type": "module",
   "main": "./src/index.ts",
-  "exports": { ".": "./src/index.ts" },
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json -d --emitDeclarationOnly",
     "lint": "echo noop",
@@ -12,9 +14,10 @@
     "dev": "echo noop"
   },
   "dependencies": {
-    "openai": "^4.56.0",
     "@anthropic-ai/sdk": "^0.24.1",
+    "@expo-google-fonts/urbanist": "^0.4.1",
     "@google/generative-ai": "^0.21.0",
+    "openai": "^4.56.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
