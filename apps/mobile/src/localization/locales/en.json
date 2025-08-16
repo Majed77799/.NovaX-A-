@@ -1,0 +1,23 @@
+{
+	"app.name": "NovaX",
+	"onboarding.title": "Create. Sell. Thrive.",
+	"onboarding.subtitle": "Your AI-powered marketplace for digital products.",
+	"cta.getStarted": "Get Started",
+	"tab.products": "Products",
+	"tab.freebies": "Freebies",
+	"tab.analytics": "Analytics",
+	"tab.community": "Community",
+	"tab.marketplace": "Marketplace",
+	"screen.profile": "Profile",
+	"screen.settings": "Settings",
+	"settings.theme": "Theme",
+	"settings.theme.light": "Light",
+	"settings.theme.dark": "Dark",
+	"settings.theme.system": "System",
+	"settings.language": "Language",
+	"product.buy": "Buy",
+	"search.placeholder": "Search products, creators…",
+	"badge.new": "New",
+	"badge.hot": "Hot",
+	"badge.free": "Free"
+}

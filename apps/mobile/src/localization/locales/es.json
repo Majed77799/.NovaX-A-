@@ -1,0 +1,23 @@
+{
+	"app.name": "NovaX",
+	"onboarding.title": "Crea. Vende. Prosperar.",
+	"onboarding.subtitle": "Tu mercado impulsado por IA para productos digitales.",
+	"cta.getStarted": "Comenzar",
+	"tab.products": "Productos",
+	"tab.freebies": "Gratis",
+	"tab.analytics": "Analítica",
+	"tab.community": "Comunidad",
+	"tab.marketplace": "Mercado",
+	"screen.profile": "Perfil",
+	"screen.settings": "Ajustes",
+	"settings.theme": "Tema",
+	"settings.theme.light": "Claro",
+	"settings.theme.dark": "Oscuro",
+	"settings.theme.system": "Sistema",
+	"settings.language": "Idioma",
+	"product.buy": "Comprar",
+	"search.placeholder": "Buscar productos, creadores…",
+	"badge.new": "Nuevo",
+	"badge.hot": "Tendencia",
+	"badge.free": "Gratis"
+}
