@@ -67,6 +67,29 @@ export default function Page() {
 		} catch { setOrb('idle'); }
 	}
 
+	async function callFeed() {
+		const res = await fetch('/api/feed');
+		const data = await res.json();
+		setMessages(prev => [...prev, { id: crypto.randomUUID(), role: 'assistant', content: `Feed: ${JSON.stringify(data).slice(0,200)}...` }]);
+	}
+	async function callBundles() {
+		const res = await fetch('/api/bundles/auto');
+		const data = await res.json();
+		setMessages(prev => [...prev, { id: crypto.randomUUID(), role: 'assistant', content: `Bundles: ${JSON.stringify(data).slice(0,200)}...` }]);
+	}
+	async function callPricing() {
+		const productId = prompt('productId?') || '';
+		if (!productId) return;
+		const res = await fetch('/api/pricing', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ productId }) });
+		const data = await res.json();
+		setMessages(prev => [...prev, { id: crypto.randomUUID(), role: 'assistant', content: `Pricing: ${JSON.stringify(data)}` }]);
+	}
+	async function callQuests() {
+		const res = await fetch('/api/quests?userId=demo');
+		const data = await res.json();
+		setMessages(prev => [...prev, { id: crypto.randomUUID(), role: 'assistant', content: `Quests: ${JSON.stringify(data)}` }]);
+	}
+
 	return (
 		<div className="container">
 			<div className={clsx('orb', orb)} aria-label={`assistant ${orb}`} />
@@ -81,6 +104,10 @@ export default function Page() {
 						<button className="quick-chip btn" onClick={() => send('Summarize my day in 3 bullet points.')}>Summarize</button>
 						<button className="quick-chip btn" onClick={() => send('Translate the last message to Spanish.')}>Translate</button>
 						<button className="quick-chip btn" onClick={() => send('Create a to-do list for this week.')}>To‑do</button>
+						<button className="quick-chip btn" onClick={callFeed}>Feed</button>
+						<button className="quick-chip btn" onClick={callBundles}>Bundles</button>
+						<button className="quick-chip btn" onClick={callPricing}>Pricing</button>
+						<button className="quick-chip btn" onClick={callQuests}>Quests</button>
 					</div>
 					<textarea
 						className="input"

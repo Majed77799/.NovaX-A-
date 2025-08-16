@@ -1,16 +1,19 @@
-export const runtime = 'edge';
+import { Redis } from '@upstash/redis';
+import { connectToDatabase } from '@repo/db';
 
-const headers = {
-	'Access-Control-Allow-Origin': process.env.NOVAX_CORS_ORIGIN ?? '*',
-	'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
-	'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-	'Cache-Control': 'no-store'
-};
+export const runtime = 'nodejs';
 
 export async function GET() {
-	return Response.json({ ok: true }, { headers });
+	const checks: Record<string, string> = {};
+	try { await connectToDatabase(); checks.mongo = 'ok'; } catch { checks.mongo = 'fail'; }
+	try {
+		if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
+			const redis = Redis.fromEnv();
+			await redis.ping();
+			checks.redis = 'ok';
+		} else { checks.redis = 'skip'; }
+	} catch { checks.redis = 'fail'; }
+	return Response.json({ ok: Object.values(checks).every(v => v === 'ok' || v === 'skip'), checks });
 }
 
-export async function OPTIONS() {
-	return new Response(null, { status: 204, headers });
-}
+export async function OPTIONS() { return new Response(null, { status: 204 }); }

@@ -30,3 +30,35 @@ export function hashAnonymousId(input: string) {
 	}
 	return `u_${Math.abs(hash)}`;
 }
+
+// Observability utilities
+export type LogLevel = 'debug'|'info'|'warn'|'error';
+
+export function log(level: LogLevel, message: string, meta?: Record<string, any>) {
+	try {
+		const line = JSON.stringify({ t: new Date().toISOString(), level, message, ...meta });
+		console[level === 'debug' ? 'log' : level]?.(line);
+	} catch {}
+}
+
+export function metric(name: string, value = 1, tags?: Record<string,string|number>) {
+	try {
+		console.log(JSON.stringify({ t: new Date().toISOString(), metric: name, value, tags }));
+	} catch {}
+}
+
+export function withTimeout<T>(p: Promise<T>, ms: number): Promise<T> {
+	let timer: any;
+	return new Promise<T>((resolve, reject) => {
+		timer = setTimeout(() => reject(new Error('timeout')), ms);
+		p.then(v => { clearTimeout(timer); resolve(v); }).catch(err => { clearTimeout(timer); reject(err); });
+	});
+}
+
+export function stableIdempotencyKey(parts: (string|number)[]) {
+	return parts.join(':');
+}
+
+export function embedWatermark(text: string, hash: string) {
+	return `${text}\n\n<!-- wm:${hash} -->`;
+}

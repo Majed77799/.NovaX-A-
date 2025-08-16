@@ -19,3 +19,5 @@ export async function POST(req: NextRequest) {
 		return new Response('Bad Request', { status: 400 });
 	}
 }
+
+export async function OPTIONS() { return new Response(null, { status: 204 }); }

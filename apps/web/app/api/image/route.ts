@@ -29,3 +29,5 @@ export async function POST(req: NextRequest) {
 	const tinyPng = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9VgqC9sAAAAASUVORK5CYII=';
 	return Response.json({ b64: tinyPng, mock: true });
 }
+
+export async function OPTIONS() { return new Response(null, { status: 204 }); }

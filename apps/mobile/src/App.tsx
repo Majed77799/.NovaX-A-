@@ -50,6 +50,14 @@ export default function App() {
 		}
 	}
 
+	async function uploadMock() {
+		Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+		try {
+			await fetch(`${process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'}/api/analytics`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ t: 'mobile_upload' }) });
+			setMessages(prev => [...prev, { id: crypto.randomUUID(), role: 'assistant', content: 'Uploaded sample asset (stub).' }]);
+		} catch {}
+	}
+
 	return (
 		<LinearGradient colors={["#F6E7FF","#E9F0FF","#D7F7FF"]} start={{x:0,y:0}} end={{x:1,y:1}} style={{ flex: 1 }}>
 			<SafeAreaView style={{ flex: 1 }}>
@@ -76,6 +84,9 @@ export default function App() {
 							onSubmitEditing={() => send(input)}
 							placeholder="Message Ello"
 						/>
+						<TouchableOpacity onPress={uploadMock} activeOpacity={0.8} style={{ paddingHorizontal: 12, paddingVertical: 8 }}>
+							<Text>⬆️</Text>
+						</TouchableOpacity>
 						<TouchableOpacity onPress={() => send(input)} activeOpacity={0.8} style={{ paddingHorizontal: 12, paddingVertical: 8 }}>
 							<Text>➤</Text>
 						</TouchableOpacity>

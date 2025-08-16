@@ -42,3 +42,48 @@ export async function apiRagUpsert(baseUrl: string, id: string, text: string, me
 	if (!res.ok) throw new Error('rag upsert failed');
 	return res.json();
 }
+
+// New APIs to be implemented in web app
+export async function apiFeed(baseUrl: string, userId?: string) {
+	const url = new URL(`${baseUrl}/api/feed`);
+	if (userId) url.searchParams.set('userId', userId);
+	const res = await fetch(url.toString(), { headers: { 'Accept-Language': typeof navigator !== 'undefined' ? navigator.language : 'en' } });
+	if (!res.ok) throw new Error('feed failed');
+	return res.json();
+}
+
+export async function apiPricing(baseUrl: string, productId: string, userId?: string) {
+	const res = await fetch(`${baseUrl}/api/pricing`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ productId, userId }) });
+	if (!res.ok) throw new Error('pricing failed');
+	return res.json();
+}
+
+export async function apiBundle(baseUrl: string, userId?: string) {
+	const res = await fetch(`${baseUrl}/api/bundles/auto`, { headers: { 'Accept-Language': typeof navigator !== 'undefined' ? navigator.language : 'en' } });
+	if (!res.ok) throw new Error('bundle failed');
+	return res.json();
+}
+
+export async function apiWatermark(baseUrl: string, orderId: string) {
+	const res = await fetch(`${baseUrl}/api/watermark`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ orderId }) });
+	if (!res.ok) throw new Error('watermark failed');
+	return res.json();
+}
+
+export async function apiSocial(baseUrl: string, action: { targetType: string; targetId: string; action: string; commentText?: string }) {
+	const res = await fetch(`${baseUrl}/api/social`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(action) });
+	if (!res.ok) throw new Error('social failed');
+	return res.json();
+}
+
+export async function apiGuilds(baseUrl: string) {
+	const res = await fetch(`${baseUrl}/api/guilds`);
+	if (!res.ok) throw new Error('guilds failed');
+	return res.json();
+}
+
+export async function apiQuests(baseUrl: string, userId: string) {
+	const res = await fetch(`${baseUrl}/api/quests?userId=${encodeURIComponent(userId)}`);
+	if (!res.ok) throw new Error('quests failed');
+	return res.json();
+}

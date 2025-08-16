@@ -12,10 +12,13 @@ export default withPWA({
 	experimental: {
 		serverActions: { allowedOrigins: ['*'] }
 	},
-	transpilePackages: ['@repo/shared', '@repo/ai', '@repo/api-client'],
+	i18n: {
+		locales: ['en', 'es', 'ar', 'zh'],
+		defaultLocale: 'en'
+	},
+	transpilePackages: ['@repo/shared', '@repo/ai', '@repo/api-client', '@repo/db'],
 	reactStrictMode: true,
 	eslint: { ignoreDuringBuilds: true },
-	api: { bodyParser: { sizeLimit: '1mb' } },
 	async headers() {
 		const corsOrigin = process.env.NOVAX_CORS_ORIGIN || '*';
 		return [
