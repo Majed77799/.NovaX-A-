@@ -1,25 +1,14 @@
-import type { Metadata } from 'next';
-import { Urbanist } from 'next/font/google';
 import './globals.css';
+import type { Metadata } from 'next';
+import { ReactNode } from 'react';
 
-const urbanist = Urbanist({ subsets: ['latin'], weight: ['400','500','600','700'], variable: '--font-urbanist', preload: true });
+export const metadata: Metadata = { title: 'Ello', description: 'AI Companion' };
 
-export const metadata: Metadata = {
-	title: 'Ello Replica',
-	description: 'Ello-inspired AI assistant',
-	manifest: '/manifest.webmanifest',
-	appleWebApp: { capable: true, statusBarStyle: 'default', title: 'Ello' },
-	icons: [ { rel: 'icon', url: '/icons/icon-192.png' } ]
-};
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }: { children: ReactNode }) {
+	const lang = 'en';
 	return (
-		<html lang="en" className={urbanist.variable}>
-			<body>
-				<div className="bg-hero-gradient min-h-dvh">
-					{children}
-				</div>
-			</body>
+		<html lang={lang}>
+			<body>{children}</body>
 		</html>
 	);
 }

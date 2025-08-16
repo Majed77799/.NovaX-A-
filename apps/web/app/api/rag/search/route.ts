@@ -11,3 +11,5 @@ export async function POST(req: NextRequest) {
 	if (error) return new Response(error.message, { status: 500 });
 	return Response.json({ matches: data });
 }
+
+export async function OPTIONS() { return new Response(null, { status: 204 }); }

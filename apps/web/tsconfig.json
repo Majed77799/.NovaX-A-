@@ -2,22 +2,34 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "jsx": "preserve",
-    "allowJs": true,
-    "noEmit": true,
-    "incremental": true,
-    "isolatedModules": true,
     "plugins": [
       {
         "name": "next"
       }
-    ]
+    ],
+    "paths": {
+      "@repo/shared/*": [
+        "../../packages/shared/src/*"
+      ],
+      "@repo/ai/*": [
+        "../../packages/ai/src/*"
+      ],
+      "@repo/api-client/*": [
+        "../../packages/api-client/src/*"
+      ],
+      "@repo/db/*": [
+        "../../packages/db/src/*"
+      ]
+    },
+    "allowJs": true,
+    "noEmit": true,
+    "incremental": true,
+    "isolatedModules": true
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "**/*.cjs",
-    "**/*.mjs",
     ".next/types/**/*.ts"
   ],
   "exclude": [

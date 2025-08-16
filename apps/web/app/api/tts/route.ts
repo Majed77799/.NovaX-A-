@@ -15,3 +15,5 @@ export async function POST(req: NextRequest) {
 	const arrayBuffer = await result.arrayBuffer();
 	return new Response(arrayBuffer, { headers: { 'Content-Type': 'audio/mpeg' } });
 }
+
+export async function OPTIONS() { return new Response(null, { status: 204 }); }
