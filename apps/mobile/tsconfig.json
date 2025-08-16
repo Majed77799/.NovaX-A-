@@ -1,8 +1,10 @@
 {
-  "extends": "../../tsconfig.base.json",
-  "compilerOptions": {
-    "jsx": "react-jsx",
-    "noEmit": true
-  },
-  "include": ["**/*.ts", "**/*.tsx"]
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"jsx": "react-native",
+		"baseUrl": ".",
+		"paths": { "@/*": ["src/*"] },
+		"types": ["nativewind/types"]
+	},
+	"include": ["src", "index.js"]
 }
