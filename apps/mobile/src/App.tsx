@@ -3,8 +3,13 @@ import { Platform, SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, 
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import * as Font from 'expo-font';
+import Constants from 'expo-constants';
 
 const ORB_SIZE = 96;
+
+function generateId() {
+	return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+}
 
 type Message = { id: string; role: 'user'|'assistant'|'system'; content: string };
 
@@ -26,23 +31,29 @@ export default function App() {
 	async function send(text: string) {
 		if (!text.trim()) return;
 		Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-		const userMsg: Message = { id: crypto.randomUUID(), role: 'user', content: text.trim() };
+		const userMsg: Message = { id: generateId(), role: 'user', content: text.trim() };
 		setMessages(prev => [...prev, userMsg]);
 		setInput('');
 		setOrb('thinking');
 		try {
-			const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'}/api/chat`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: [...messages, userMsg] }) });
-			if (!res.body) { setOrb('idle'); return; }
-			const reader = res.body.getReader();
-			const decoder = new TextDecoder();
-			let assistantMsg: Message = { id: crypto.randomUUID(), role: 'assistant', content: '' };
+			const baseUrl = (Constants?.expoConfig?.extra as any)?.API_URL ?? 'http://localhost:3000';
+			const res = await fetch(`${baseUrl}/api/chat`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: [...messages, userMsg] }) });
+			let assistantMsg: Message = { id: generateId(), role: 'assistant', content: '' };
 			setMessages(prev => [...prev, assistantMsg]);
-			setOrb('speaking');
-			while (true) {
-				const { done, value } = await reader.read();
-				if (done) break;
-				const chunk = decoder.decode(value, { stream: true });
-				assistantMsg = { ...assistantMsg, content: assistantMsg.content + chunk };
+			if (Platform.OS === 'web' && (res as any).body && typeof (globalThis as any).TextDecoder !== 'undefined') {
+				const reader = (res as any).body.getReader();
+				const decoder = new (globalThis as any).TextDecoder();
+				setOrb('speaking');
+				while (true) {
+					const { done, value } = await reader.read();
+					if (done) break;
+					const chunk = decoder.decode(value, { stream: true });
+					assistantMsg = { ...assistantMsg, content: assistantMsg.content + chunk };
+					setMessages(prev => prev.map(m => m.id === assistantMsg.id ? assistantMsg : m));
+				}
+			} else {
+				const textData = await res.text();
+				assistantMsg = { ...assistantMsg, content: textData };
 				setMessages(prev => prev.map(m => m.id === assistantMsg.id ? assistantMsg : m));
 			}
 		} finally {
