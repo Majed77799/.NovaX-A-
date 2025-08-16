@@ -1,8 +1,9 @@
 "use client";
 import { useState } from 'react';
+import { Button, Input, Textarea } from '@repo/ui';
 
-export function InputBar({ onSend }: { onSend: (text: string) => void }) {
-	const [value, setValue] = useState('');
+export default function InputBar({ onSend, onSpeak }: { onSend: (text: string) => void; onSpeak: () => void }) {
+	const [input, setInput] = useState('');
 	return (
 		<div className="input-bar">
 			<div className="input-shell">
@@ -11,8 +12,9 @@ export function InputBar({ onSend }: { onSend: (text: string) => void }) {
 					<button className="quick-chip btn" onClick={() => onSend('Translate the last message to Spanish.')}>Translate</button>
 					<button className="quick-chip btn" onClick={() => onSend('Create a to-do list for this week.')}>To‑do</button>
 				</div>
-				<textarea className="input" rows={1} value={value} onChange={e => setValue(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); onSend(value); setValue(''); } }} placeholder="Message Ello" aria-label="Message Ello" />
-				<button className="btn" onClick={() => { onSend(value); setValue(''); }} aria-label="Send">➤</button>
+				<Textarea className="input" rows={1} value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); onSend(input); setInput(''); } }} placeholder="Message" aria-label="Message" />
+				<Button variant="ghost" onClick={() => { onSend(input); setInput(''); }} aria-label="Send">➤</Button>
+				<Button variant="ghost" onClick={onSpeak} aria-label="Speak">🔊</Button>
 			</div>
 		</div>
 	);

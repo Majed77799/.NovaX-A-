@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { Urbanist } from 'next/font/google';
 import './globals.css';
+import '@repo/ui/styles.css';
+import Providers from './providers';
 
 const urbanist = Urbanist({ subsets: ['latin'], weight: ['400','500','600','700'], variable: '--font-urbanist', preload: true });
 
@@ -17,7 +19,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 		<html lang="en" className={urbanist.variable}>
 			<body>
 				<div className="bg-hero-gradient min-h-dvh">
-					{children}
+					<Providers>
+						{children}
+					</Providers>
 				</div>
 			</body>
 		</html>

@@ -25,6 +25,17 @@ Set environment variables: copy `.env.example` to `.env.local` (for web) or your
 npm run build
 ```
 
+## Design System (NovaX UI)
+- Package: `packages/ui` → import from `@repo/ui`
+- Tokens: see `packages/ui/src/theme.ts` and global variables in `packages/ui/src/styles.css`
+- Dark mode: toggled via `data-theme` attribute (provided by `ThemeProvider`)
+- Motion: springy micro-interactions with framer-motion; reduced motion respected
+- Docs page: open `/design` (coming soon) or read `apps/web/docs/UX_NOTES.md`
+
+## Tests
+- Unit/snapshot: `npm -w apps/web run test`
+- E2E (jsdom): covers feed infinite scroll and visibility of CTA
+
 ## Skia vs SVG orb
 - Default: CSS/SVG glow orb for universal parity and 60fps without native modules.
 - Mobile: `@shopify/react-native-skia` can be enabled to render a shader glow orb. We use CSS/SVG fallback by default to avoid Expo Go breakage. Enable Skia in a future iteration for production builds.
