@@ -15,5 +15,8 @@
   },
   "devDependencies": {
     "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "@expo-google-fonts/urbanist": "^0.4.1"
   }
 }
