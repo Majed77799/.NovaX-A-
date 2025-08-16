@@ -8,6 +8,17 @@ const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
 const limiter = redisUrl && redisToken ? new Ratelimit({ redis: Redis.fromEnv(), limiter: Ratelimit.fixedWindow(30, '1 m') }) : null;
 const authSecret = process.env.AUTH_JWT_SECRET;
 
+const allowlist: RegExp[] = [
+	/^\/api\/auth(\/|$)/,
+	/^\/api\/health(\/|$)/,
+	/^\/api\/stripe\/webhook$/,
+	/^\/api\/chat$/,
+	/^\/api\/tts$/,
+	/^\/api\/stt$/,
+	/^\/api\/image$/,
+	/^\/api\/analytics$/
+];
+
 export async function middleware(request: NextRequest) {
 	const ip = request.ip ?? request.headers.get('x-forwarded-for') ?? 'unknown';
 	if (limiter) {
@@ -15,10 +26,14 @@ export async function middleware(request: NextRequest) {
 		if (!success) return new NextResponse('Too Many Requests', { status: 429 });
 	}
 	if (request.nextUrl.pathname.startsWith('/api') && authSecret) {
-		const auth = request.headers.get('authorization') ?? '';
-		const token = auth.toLowerCase().startsWith('bearer ') ? auth.slice(7).trim() : '';
-		if (!token) return new NextResponse('Unauthorized', { status: 401 });
-		try { await jwtVerify(token, new TextEncoder().encode(authSecret)); } catch { return new NextResponse('Unauthorized', { status: 401 }); }
+		const path = request.nextUrl.pathname;
+		const isAllowed = allowlist.some(re => re.test(path));
+		if (!isAllowed) {
+			const auth = request.headers.get('authorization') ?? '';
+			const token = auth.toLowerCase().startsWith('bearer ') ? auth.slice(7).trim() : '';
+			if (!token) return new NextResponse('Unauthorized', { status: 401 });
+			try { await jwtVerify(token, new TextEncoder().encode(authSecret)); } catch { return new NextResponse('Unauthorized', { status: 401 }); }
+		}
 	}
 	const res = NextResponse.next();
 	res.headers.set('x-request-id', crypto.randomUUID());

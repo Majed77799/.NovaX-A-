@@ -17,6 +17,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 		<html lang="en" className={urbanist.variable}>
 			<body>
 				<div className="bg-hero-gradient min-h-dvh">
+					<nav style={{ display: 'flex', gap: 12, padding: 12 }}>
+						<a className="quick-chip btn" href="/">Assistant</a>
+						<a className="quick-chip btn" href="/dashboard">Dashboard</a>
+						<a className="quick-chip btn" href="/market">Market</a>
+						<a className="quick-chip btn" href="/content">Content</a>
+						<a className="quick-chip btn" href="/login" style={{ marginLeft: 'auto' }}>Login</a>
+					</nav>
 					{children}
 				</div>
 			</body>

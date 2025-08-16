@@ -1,6 +1,15 @@
-# Ello Perfect Replica (Web + Mobile)
+# Ello Replica Monorepo
 
-Monorepo with Next.js 14 PWA (`apps/web`) and Expo Go app (`apps/mobile`), plus shared packages for AI orchestration and utilities.
+This monorepo contains a Next.js web app and an Expo mobile app, sharing AI, integrations, and utilities packages.
+
+- apps/web: Next.js 14 app (PWA)
+- apps/mobile: Expo (SDK 53) mobile app with Expo Router
+- packages/ai: AI providers wrapper used by both apps
+- packages/shared: shared types and utilities
+- packages/api-client: lightweight client for calling the web API
+- packages/integrations: Stripe, Gumroad, and OAuth helpers
+
+See ROADMAP.md for full architecture and integration details.
 
 ## Install
 

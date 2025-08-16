@@ -20,7 +20,7 @@ body { margin: 0; font-family: var(--font-urbanist), system-ui, -apple-system, S
 
 .input-bar { position: fixed; left: 0; right: 0; bottom: 0; padding: 16px; }
 .input-shell { display: flex; gap: 8px; background: #ffffff; border: 1px solid rgba(15,18,35,0.08); border-radius: 999px; padding: 10px; box-shadow: var(--shadow); align-items: flex-end; }
-.input { flex: 1; resize: none; max-height: calc(1.5em * 4 + 16px); min-height: 24px; border: 0; outline: 0; font: inherit; padding: 8px 12px; border-radius: 12px; }
+.input { flex: 1; resize: none; max-height: calc(1.5em * 4 + 16px); min-height: 24px; border: 0; outline: 0; font: inherit; padding: 8px 12px; border-radius: 12px; background: #fff; border: 1px solid rgba(15,18,35,0.08); }
 .btn { appearance: none; border: 0; background: transparent; border-radius: 12px; padding: 8px 12px; cursor: pointer; transition: transform .1s ease, opacity .2s ease; }
 .btn:active { transform: scale(0.96); }
 .fade-enter { opacity: 0; transform: translateY(6px); }
@@ -36,3 +36,5 @@ body { margin: 0; font-family: var(--font-urbanist), system-ui, -apple-system, S
 @keyframes orbPulse { 0%,100%{ box-shadow: 0 0 28px rgba(120,65,255,0.30), inset 0 0 36px rgba(124,193,255,0.30);} 50%{ box-shadow: 0 0 40px rgba(120,65,255,0.45), inset 0 0 48px rgba(124,193,255,0.45);} }
 @keyframes orbThinking { 0%,100%{ transform: translateY(0);} 50%{ transform: translateY(-2px);} }
 @keyframes orbSpeaking { 0%,100%{ transform: scale(1);} 50%{ transform: scale(1.04);} }
+
+.nav a { text-decoration: none; }
