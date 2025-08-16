@@ -2,31 +2,18 @@ import withPWA from 'next-pwa';
 
 const isProd = process.env.NODE_ENV === 'production';
 
-export default withPWA({
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+	experimental: { serverActions: { bodySizeLimit: '5mb' } },
+	images: { remotePatterns: [ { protocol: 'https', hostname: '**' } ] },
+	eslint: { ignoreDuringBuilds: true }
+};
+
+const withPWAConfigured = withPWA({
 	dest: 'public',
 	disable: !isProd,
 	register: true,
-	skipWaiting: true,
-	buildExcludes: [/middleware-manifest\.json$/]
-})({
-	experimental: {
-		serverActions: { allowedOrigins: ['*'] }
-	},
-	transpilePackages: ['@repo/shared', '@repo/ai', '@repo/api-client'],
-	reactStrictMode: true,
-	eslint: { ignoreDuringBuilds: true },
-	api: { bodyParser: { sizeLimit: '1mb' } },
-	async headers() {
-		const corsOrigin = process.env.NOVAX_CORS_ORIGIN || '*';
-		return [
-			{
-				source: '/api/:path*',
-				headers: [
-					{ key: 'Access-Control-Allow-Origin', value: corsOrigin },
-					{ key: 'Access-Control-Allow-Methods', value: 'GET,POST,OPTIONS' },
-					{ key: 'Access-Control-Allow-Headers', value: 'Content-Type, Authorization' }
-				]
-			}
-		];
-	}
+	skipWaiting: true
 });
+
+export default withPWAConfigured(nextConfig);
