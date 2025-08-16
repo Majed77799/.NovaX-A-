@@ -1,26 +1,35 @@
 {
   "name": "mobile",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "main": "index.js",
   "scripts": {
     "dev": "expo start --clear --non-interactive",
-    "build": "echo Expo Go build handled externally",
+    "update:preview": "eas update --channel preview --non-interactive --auto",
+    "update:prod": "eas update --channel production --non-interactive --auto",
+    "build:android": "eas build --platform android --profile production --non-interactive",
+    "build:android-apk": "eas build --platform android --profile preview --non-interactive",
+    "build:ios": "eas build --platform ios --profile production --non-interactive",
+    "submit:android": "eas submit -p android --profile production --non-interactive",
+    "submit:ios": "eas submit -p ios --profile production --non-interactive",
     "lint": "echo noop",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "android": "expo run:android",
+    "ios": "expo run:ios"
   },
   "dependencies": {
     "expo": "~51.0.23",
+    "expo-build-properties": "~0.12.5",
     "expo-constants": "~16.0.2",
     "expo-haptics": "~13.0.1",
-    "expo-status-bar": "~1.12.1",
     "expo-linear-gradient": "~13.0.2",
+    "expo-status-bar": "~1.12.1",
     "react": "18.2.0",
-    "react-native": "0.74.3",
-    "expo-font": "~12.0.10"
+    "react-native": "0.74.3"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
+    "babel-plugin-transform-remove-console": "^6.9.4",
     "typescript": "^5.4.5"
   }
 }

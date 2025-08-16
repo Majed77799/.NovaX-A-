@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Platform, SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
-import * as Font from 'expo-font';
+import Constants from 'expo-constants';
 
 const ORB_SIZE = 96;
 
@@ -10,32 +10,32 @@ type Message = { id: string; role: 'user'|'assistant'|'system'; content: string 
 
 type OrbState = 'idle'|'thinking'|'speaking';
 
+function generateId(): string {
+	return `${Math.random().toString(36).slice(2)}-${Date.now().toString(36)}`;
+}
+
 export default function App() {
-	const [fontLoaded, setFontLoaded] = useState(false);
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [input, setInput] = useState('');
 	const [orb, setOrb] = useState<OrbState>('idle');
 	const scrollRef = useRef<ScrollView>(null);
-
-	useEffect(() => {
-		Font.loadAsync({ Urbanist: require('./assets/Urbanist-VariableFont_wght.ttf') }).then(() => setFontLoaded(true));
-	}, []);
 
 	useEffect(() => { scrollRef.current?.scrollToEnd({ animated: true }); }, [messages.length]);
 
 	async function send(text: string) {
 		if (!text.trim()) return;
 		Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-		const userMsg: Message = { id: crypto.randomUUID(), role: 'user', content: text.trim() };
+		const userMsg: Message = { id: generateId(), role: 'user', content: text.trim() };
 		setMessages(prev => [...prev, userMsg]);
 		setInput('');
 		setOrb('thinking');
 		try {
-			const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'}/api/chat`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: [...messages, userMsg] }) });
+			const apiBase = (Constants?.expoConfig as any)?.extra?.apiUrl || (Constants as any)?.manifest2?.extra?.apiUrl || 'https://example.com';
+			const res = await fetch(`${apiBase}/api/chat`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: [...messages, userMsg] }) });
 			if (!res.body) { setOrb('idle'); return; }
 			const reader = res.body.getReader();
 			const decoder = new TextDecoder();
-			let assistantMsg: Message = { id: crypto.randomUUID(), role: 'assistant', content: '' };
+			let assistantMsg: Message = { id: generateId(), role: 'assistant', content: '' };
 			setMessages(prev => [...prev, assistantMsg]);
 			setOrb('speaking');
 			while (true) {
@@ -57,7 +57,7 @@ export default function App() {
 				<ScrollView ref={scrollRef} contentContainerStyle={{ padding: 16, paddingBottom: 140 }}>
 					{messages.map(m => (
 						<View key={m.id} style={{ maxWidth: '80%', alignSelf: m.role === 'assistant' ? 'flex-start' : 'flex-end', backgroundColor: m.role === 'assistant' ? 'rgba(255,255,255,0.5)' : '#fff', paddingHorizontal: 14, paddingVertical: 10, borderRadius: 16, marginBottom: 10, borderWidth: m.role==='assistant'?1:0, borderColor: 'rgba(255,255,255,0.25)' }}>
-							<Text style={{ fontFamily: fontLoaded ? 'Urbanist' : undefined, fontSize: 16, lineHeight: 22 }}>{m.content}</Text>
+							<Text style={{ fontSize: 16, lineHeight: 22 }}>{m.content}</Text>
 						</View>
 					))}
 				</ScrollView>
@@ -69,7 +69,7 @@ export default function App() {
 							<QuickChip label="To‑do" onPress={() => send('Create a to-do list for this week.')} />
 						</View>
 						<TextInput
-							style={{ flex: 1, paddingHorizontal: 12, paddingVertical: 8, maxHeight: 24*4, fontFamily: fontLoaded ? 'Urbanist' : undefined }}
+							style={{ flex: 1, paddingHorizontal: 12, paddingVertical: 8, maxHeight: 24*4 }}
 							value={input}
 							multiline
 							onChangeText={setInput}
