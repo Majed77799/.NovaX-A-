@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { signJwt, hashPassword } from '@repo/shared/src/auth';
+import { signJwt, hashPassword } from '@repo/shared/auth';
 
 export const runtime = 'edge';
 

@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { generateStreaming } from '@repo/ai';
-import { getUserFromRequest } from '@repo/shared/src/auth';
+import { getUserFromRequest } from '@repo/shared/auth';
 import { Redis } from '@upstash/redis';
 
 export const runtime = 'edge';

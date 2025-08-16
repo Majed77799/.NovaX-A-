@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { exchangeGoogleCode, fetchGoogleUserInfo } from '@repo/integrations';
-import { signJwt } from '@repo/shared/src/auth';
+import { signJwt } from '@repo/shared/auth';
 
 export const runtime = 'edge';
 
@@ -16,9 +16,8 @@ export async function GET(req: NextRequest) {
 	const email = info?.email ?? undefined;
 	const sub = info?.sub ?? 'google-user';
 	const token = await signJwt({ userId: sub, email, premium: false, provider: 'google' });
-	// Redirect to app with JWT in fragment (or set-cookie in non-edge runtime)
 	const target = new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000');
-	target.pathname = '/';
+	target.pathname = '/login';
 	target.hash = `token=${encodeURIComponent(token)}`;
 	return NextResponse.redirect(target);
 }

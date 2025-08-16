@@ -15,7 +15,8 @@
       "@repo/shared/*": ["packages/shared/src/*"],
       "@repo/ai/*": ["packages/ai/src/*"],
       "@repo/api-client/*": ["packages/api-client/src/*"],
-      "@repo/integrations/*": ["packages/integrations/src/*"]
+      "@repo/integrations/*": ["packages/integrations/src/*"],
+      "@repo/integrations": ["packages/integrations/src/index.ts"]
     }
   }
 }

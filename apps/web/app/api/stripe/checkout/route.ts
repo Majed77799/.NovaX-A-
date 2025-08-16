@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import Stripe from 'stripe';
-import { getUserFromRequest } from '@repo/shared/src/auth';
+import { getUserFromRequest } from '@repo/shared/auth';
 
 export const runtime = 'edge';
 
