@@ -1,0 +1,28 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base/ai-engine-deployment.yaml
+  - ../../base/marketplace-deployment.yaml
+  - ../../base/payment-deployment.yaml
+  - ../../base/globalization-deployment.yaml
+  - ../../base/security-deployment.yaml
+  - ../../base/community-deployment.yaml
+  - ../../base/analytics-deployment.yaml
+  - ../../base/redis-statefulset.yaml
+  - ../../base/ingress.yaml
+namespace: novax
+images:
+  - name: novax/ai-engine
+    newTag: latest
+  - name: novax/marketplace
+    newTag: latest
+  - name: novax/payment
+    newTag: latest
+  - name: novax/globalization
+    newTag: latest
+  - name: novax/security
+    newTag: latest
+  - name: novax/community
+    newTag: latest
+  - name: novax/analytics
+    newTag: latest

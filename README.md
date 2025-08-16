@@ -1,43 +1,45 @@
-# Ello Perfect Replica (Web + Mobile)
+# NovaX Platform
 
-Monorepo with Next.js 14 PWA (`apps/web`) and Expo Go app (`apps/mobile`), plus shared packages for AI orchestration and utilities.
+A microservices platform for AI-driven product research, generation, marketplace commerce, payments, globalization, security, community, and analytics.
 
-## Install
+## Goals
+- Microservices for flexibility and scale
+- Clear separation of concerns
+- Containerized with Docker, orchestrated by Kubernetes
 
-```bash
-npm install
-```
+## Services
+- AI Engine: Product Researcher, Product Generator, Marketing Copilot (async jobs via Redis + BullMQ)
+- Marketplace: Listings, purchases, freebies funnel, affiliates (REST + GraphQL)
+- Payment: Stripe, PayPal, Wise, Crypto (extensible; optional Web3)
+- Globalization: Localization AI (20+ languages), regional optimization
+- Security: Auth (JWT/OAuth/Social), anti-piracy watermarking, threat monitoring
+- Community: Gamification, social layer, referrals/affiliates
+- Analytics: Sales, funnels, retention, AI-driven optimization
 
-## Dev
+## Tech Stack
+- Frontend: Next.js (web), React Native/Expo (mobile)
+- Backend: Node.js (NestJS, TypeScript)
+- Data: PostgreSQL, MongoDB, Redis (cache/queue)
+- Infra: Docker, Kubernetes (AWS/GCP/Azure)
+- Observability: Prometheus, Grafana, ELK
 
-```bash
-# Web
-npm run dev:web
-# Mobile (Expo Go)
-npm run dev:mobile
-```
+## Development
+- Each service runs independently with its own API and Dockerfile
+- Kubernetes manifests in `infra/k8s`
+- Local dev via Docker Compose: `docker-compose.dev.yml`
 
-Set environment variables: copy `.env.example` to `.env.local` (for web) or your host.
+## Quickstart
+1. Install Node 20+
+2. Install dependencies: `npm install`
+3. Run all services in dev: `npm run dev`
 
-## Build
+## Deployment
+- Build images per service; deploy with kustomize overlays under `infra/k8s/overlays/{dev,prod}`
 
-```bash
-npm run build
-```
+## Security
+- JWT-based auth, OAuth providers, rate limiting at gateway/ingress
+- Secret management via K8s Secrets or external secret stores
 
-## Skia vs SVG orb
-- Default: CSS/SVG glow orb for universal parity and 60fps without native modules.
-- Mobile: `@shopify/react-native-skia` can be enabled to render a shader glow orb. We use CSS/SVG fallback by default to avoid Expo Go breakage. Enable Skia in a future iteration for production builds.
-
-## Troubleshooting
-- 429 errors: configure Upstash env for rate limit or unset to disable.
-- SSE not streaming on some hosts: ensure Vercel edge runtime is used and no body buffering middleware.
-- Whisper/STT: requires `OPENAI_API_KEY`.
-- Supabase RAG: create `documents` table with `embedding vector(1536)` and RPC `match_documents`.
-- Stripe: set `STRIPE_SECRET_KEY`, `STRIPE_PRICE_ID`.
-
-## Next steps
-- Add analytics (PostHog or custom) with consent.
-- Add i18n auto-translate on the fly.
-- Add offline IndexedDB caching for messages/templates.
-- Polish animations and orb shader for Skia on mobile builds.
+## Observability
+- Liveness/readiness probes
+- Structured logs; metrics endpoints for Prometheus scraping
