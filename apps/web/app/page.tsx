@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
+import InputBar from './(components)/InputBar';
+import Orb from './(components)/Orb';
 
 type Message = { id: string; role: 'user'|'assistant'|'system'; content: string };
 
@@ -8,7 +10,6 @@ type OrbState = 'idle'|'thinking'|'speaking';
 
 export default function Page() {
 	const [messages, setMessages] = useState<Message[]>([]);
-	const [input, setInput] = useState('');
 	const [orb, setOrb] = useState<OrbState>('idle');
 	const listRef = useRef<HTMLDivElement>(null);
 	const abortRef = useRef<AbortController | null>(null);
@@ -29,7 +30,6 @@ export default function Page() {
 		if (!text.trim()) return;
 		const userMsg: Message = { id: crypto.randomUUID(), role: 'user', content: text.trim() };
 		setMessages(prev => [...prev, userMsg]);
-		setInput('');
 		setOrb('thinking');
 		abortRef.current?.abort();
 		const controller = new AbortController();
@@ -69,32 +69,13 @@ export default function Page() {
 
 	return (
 		<div className="container">
-			<div className={clsx('orb', orb)} aria-label={`assistant ${orb}`} />
+			<Orb state={orb === 'idle' ? 'idle' : orb === 'speaking' ? 'pulse' : 'active'} />
 			<div className="chat" ref={listRef}>
 				{messages.map(m => (
 					<div key={m.id} className={clsx('bubble', m.role === 'assistant' ? 'assistant' : 'user')}>{m.content}</div>
 				))}
 			</div>
-			<div className="input-bar">
-				<div className="input-shell">
-					<div className="quick-actions">
-						<button className="quick-chip btn" onClick={() => send('Summarize my day in 3 bullet points.')}>Summarize</button>
-						<button className="quick-chip btn" onClick={() => send('Translate the last message to Spanish.')}>Translate</button>
-						<button className="quick-chip btn" onClick={() => send('Create a to-do list for this week.')}>To‑do</button>
-					</div>
-					<textarea
-						className="input"
-						rows={1}
-						value={input}
-						onChange={e => setInput(e.target.value)}
-						onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(input); } }}
-						placeholder="Message Ello"
-						aria-label="Message Ello"
-					/>
-					<button className="btn" onClick={() => send(input)} aria-label="Send">➤</button>
-					<button className="btn" onClick={speakLast} aria-label="Speak">🔊</button>
-				</div>
-			</div>
+			<InputBar onSend={send} onSpeak={speakLast} />
 		</div>
 	);
 }
