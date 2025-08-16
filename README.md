@@ -41,3 +41,57 @@ npm run build
 - Add i18n auto-translate on the fly.
 - Add offline IndexedDB caching for messages/templates.
 - Polish animations and orb shader for Skia on mobile builds.
+
+## Mobile app (Expo + EAS) — Production build & publish
+
+- Prereqs:
+  - Create an Expo account and set `EXPO_TOKEN` as an org/repo secret in CI, or run `eas login` locally.
+  - For iOS, enroll in Apple Developer Program and have an App Store Connect account.
+
+### Android
+- Local artifacts already built:
+  - AAB: `apps/mobile/android/app/build/outputs/bundle/release/app-release.aab`
+  - APK: `apps/mobile/android/app/build/outputs/apk/release/app-release.apk`
+- Sign and upload:
+  - If you need Play App Signing, you can upload the AAB as-is to Google Play Console.
+  - Create app in Play Console with package `com.novax.ello`.
+
+### iOS (EAS cloud)
+- Build IPA in cloud:
+```bash
+cd apps/mobile
+export EXPO_TOKEN=your_expo_token
+# Set up credentials automatically (recommended)
+eas build:configure --platform ios --non-interactive
+eas build --platform ios --profile production --non-interactive
+```
+- After build completes, download the `.ipa` from the EAS build details page, then upload via Transporter or `eas submit`:
+```bash
+# Submit to App Store Connect (automated)
+eas submit -p ios --profile production --non-interactive
+```
+
+### OTA updates (EAS Update)
+- Channels: `preview`, `production`
+```bash
+cd apps/mobile
+export EXPO_TOKEN=your_expo_token
+eas update --channel preview --non-interactive --auto
+# after release tag or when ready for production
+eas update --channel production --non-interactive --auto
+```
+
+### Env configuration
+- API base URL configured via `app.json > expo.extra.apiUrl`.
+  - Override at build time: `EXPO_PUBLIC_API_URL` or edit `app.json`.
+
+### Compliance
+- iOS `ITSAppUsesNonExemptEncryption=false` configured.
+- Android permissions restricted to `INTERNET` only.
+- Hermes enabled for both platforms; R8/Proguard/shrinkResources enabled for smaller bundles.
+
+### CI/CD
+- Workflow at `.github/workflows/eas.yml`:
+  - On push to main: EAS Update to `preview`.
+  - On tag: Builds Android AAB and iOS IPA in EAS, then uploads as workflow artifacts.
+  - Requires `EXPO_TOKEN` secret in the repository.

@@ -1,0 +1,80 @@
+name: Mobile CI/CD
+
+on:
+	push:
+		branches: [ main ]
+		paths:
+			- 'apps/mobile/**'
+	workflow_dispatch:
+	release:
+		types: [published]
+
+jobs:
+	update:
+		if: github.ref == 'refs/heads/main'
+		runs-on: ubuntu-latest
+		steps:
+			- uses: actions/checkout@v4
+			- uses: actions/setup-node@v4
+			  with:
+				node-version: '20'
+			- name: Install dependencies
+			  run: npm ci
+			- name: Install EAS CLI + jq
+			  run: npm i -g eas-cli@latest expo@latest && sudo apt-get update -y && sudo apt-get install -y jq curl
+			- name: EAS Update (Preview channel)
+			  working-directory: apps/mobile
+			  env:
+				EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+			  run: |
+				eas update --channel preview --non-interactive --auto
+
+	android_build:
+		if: startsWith(github.ref, 'refs/tags/')
+		runs-on: ubuntu-latest
+		steps:
+			- uses: actions/checkout@v4
+			- uses: actions/setup-node@v4
+			  with:
+				node-version: '20'
+			- name: Install dependencies
+			  run: npm ci
+			- name: Install EAS CLI + jq
+			  run: npm i -g eas-cli@latest expo@latest && sudo apt-get update -y && sudo apt-get install -y jq curl
+			- name: Build Android (AAB)
+			  working-directory: apps/mobile
+			  env:
+				EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+			  run: |
+				URL=$(eas build --platform android --profile production --non-interactive --json | jq -r '.[0].artifacts.buildUrl')
+				curl -L "$URL" -o dist/android.aab
+			- name: Upload AAB artifact
+			  uses: actions/upload-artifact@v4
+			  with:
+				name: android-aab
+				path: apps/mobile/dist/android.aab
+
+	ios_build:
+		if: startsWith(github.ref, 'refs/tags/')
+		runs-on: macos-14
+		steps:
+			- uses: actions/checkout@v4
+			- uses: actions/setup-node@v4
+			  with:
+				node-version: '20'
+			- name: Install dependencies
+			  run: npm ci
+			- name: Install EAS CLI + jq
+			  run: npm i -g eas-cli@latest expo@latest && brew update && brew install jq curl
+			- name: Build iOS (IPA)
+			  working-directory: apps/mobile
+			  env:
+				EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+			  run: |
+				URL=$(eas build --platform ios --profile production --non-interactive --json | jq -r '.[0].artifacts.buildUrl')
+				curl -L "$URL" -o dist/ios.ipa
+			- name: Upload IPA artifact
+			  uses: actions/upload-artifact@v4
+			  with:
+				name: ios-ipa
+				path: apps/mobile/dist/ios.ipa
