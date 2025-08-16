@@ -1,0 +1,2 @@
+export const formatCurrency = (value: number, currency: string = 'USD') => new Intl.NumberFormat(undefined, { style: 'currency', currency }).format(value);
+export const truncate = (text: string, length = 120) => (text.length > length ? text.slice(0, length - 1) + '…' : text);

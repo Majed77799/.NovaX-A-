@@ -1,0 +1,5 @@
+export const ENV = {
+  STRIPE_PUBLISHABLE_KEY: process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY || 'pk_test_12345',
+  SUPABASE_URL: process.env.EXPO_PUBLIC_SUPABASE_URL || '',
+  SUPABASE_ANON_KEY: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '',
+};
