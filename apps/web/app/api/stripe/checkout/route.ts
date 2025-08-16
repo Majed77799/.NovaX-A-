@@ -5,12 +5,13 @@ export const runtime = 'edge';
 
 export async function POST(req: NextRequest) {
 	const price = process.env.STRIPE_PRICE_ID;
-	if (!process.env.STRIPE_SECRET_KEY || !price) return new Response('Stripe not configured', { status: 500 });
+	if (!process.env.STRIPE_SECRET_KEY) return new Response('Stripe not configured', { status: 500 });
 	const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2024-06-20' as any });
 	const origin = req.headers.get('origin') ?? process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+	const { amount = 0, currency = 'USD' } = await req.json().catch(() => ({}));
 	const session = await stripe.checkout.sessions.create({
 		mode: 'payment',
-		line_items: [{ price, quantity: 1 }],
+		line_items: price ? [{ price, quantity: 1 }] : [{ price_data: { currency, unit_amount: amount, product_data: { name: 'NovaX Product' } }, quantity: 1 }],
 		success_url: `${origin}/settings?status=success`,
 		cancel_url: `${origin}/settings?status=cancel`
 	});
