@@ -14,11 +14,15 @@ export async function middleware(request: NextRequest) {
 		const { success } = await limiter.limit(`mw:${ip}`);
 		if (!success) return new NextResponse('Too Many Requests', { status: 429 });
 	}
-	if (request.nextUrl.pathname.startsWith('/api') && authSecret) {
-		const auth = request.headers.get('authorization') ?? '';
-		const token = auth.toLowerCase().startsWith('bearer ') ? auth.slice(7).trim() : '';
-		if (!token) return new NextResponse('Unauthorized', { status: 401 });
-		try { await jwtVerify(token, new TextEncoder().encode(authSecret)); } catch { return new NextResponse('Unauthorized', { status: 401 }); }
+	const path = request.nextUrl.pathname;
+	if (path.startsWith('/api') && authSecret) {
+		const open = path.startsWith('/api/stripe/webhook') || path.startsWith('/api/health') || path.startsWith('/api/download');
+		if (!open) {
+			const auth = request.headers.get('authorization') ?? '';
+			const token = auth.toLowerCase().startsWith('bearer ') ? auth.slice(7).trim() : '';
+			if (!token) return new NextResponse('Unauthorized', { status: 401 });
+			try { await jwtVerify(token, new TextEncoder().encode(authSecret)); } catch { return new NextResponse('Unauthorized', { status: 401 }); }
+		}
 	}
 	const res = NextResponse.next();
 	res.headers.set('x-request-id', crypto.randomUUID());

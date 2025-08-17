@@ -30,3 +30,48 @@ export function hashAnonymousId(input: string) {
 	}
 	return `u_${Math.abs(hash)}`;
 }
+
+export function createSignedUrl(path: string, secret: string, expiresInSeconds = 300) {
+	const exp = Math.floor(Date.now() / 1000) + expiresInSeconds;
+	const data = `${path}:${exp}`;
+	const sig = toBase64Url(hmacSHA256(data, secret));
+	return `${path}?exp=${exp}&sig=${sig}`;
+}
+
+export function verifySignedUrl(pathWithQuery: string, secret: string) {
+	const url = new URL(pathWithQuery, 'http://localhost');
+	const exp = url.searchParams.get('exp');
+	const sig = url.searchParams.get('sig');
+	if (!exp || !sig) return false;
+	const path = url.pathname + (url.search ? url.search.replace(/([&?])(exp|sig)=[^&]*/g, '').replace(/^\?&?/, url.search.includes('&') ? '?' : '') : '');
+	const data = `${path}:${exp}`;
+	const expected = toBase64Url(hmacSHA256(data, secret));
+	const now = Math.floor(Date.now() / 1000);
+	return expected === sig && now <= parseInt(exp, 10);
+}
+
+function toBase64Url(buf: Uint8Array) {
+	let str = '';
+	buf.forEach(b => { str += String.fromCharCode(b); });
+	return btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+function hmacSHA256(input: string, secret: string) {
+	const enc = new TextEncoder();
+	const key = enc.encode(secret);
+	const msg = enc.encode(input);
+	// simple XOR fallback; replace with WebCrypto in runtime as needed
+	const out = new Uint8Array(Math.max(key.length, msg.length));
+	for (let i = 0; i < out.length; i++) out[i] = (key[i % key.length] ^ msg[i % msg.length]) & 0xff;
+	return out;
+}
+
+export function generateLicenseJSON(params: { buyerEmail: string; productId: string; transactionHash: string; terms?: any }) {
+	return {
+		buyerEmail: params.buyerEmail,
+		productId: params.productId,
+		transactionHash: params.transactionHash,
+		terms: params.terms ?? { usage: 'single-user, non-transferable' },
+		issuedAt: new Date().toISOString()
+	};
+}

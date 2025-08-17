@@ -10,10 +10,13 @@
     "dev": "turbo run dev --parallel",
     "dev:web": "turbo run dev --filter=web",
     "dev:mobile": "turbo run dev --filter=mobile",
+    "dev:worker": "turbo run dev --filter=worker",
     "build": "turbo run build",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
-    "format": "turbo run format"
+    "format": "turbo run format",
+    "prisma:generate": "turbo run prisma:generate --filter=@repo/db",
+    "prisma:migrate": "turbo run prisma:migrate --filter=@repo/db"
   },
   "devDependencies": {
     "turbo": "^2.0.3",

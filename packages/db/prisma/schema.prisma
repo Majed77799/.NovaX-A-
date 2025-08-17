@@ -1,0 +1,211 @@
+// datasource and generator
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// enums
+
+enum AssetType {
+  PDF
+  IMAGE
+  VIDEO
+  OTHER
+}
+
+enum EventType {
+  LIKE
+  SAVE
+  SHARE
+  CLICK
+}
+
+enum AffiliateStatus {
+  PENDING
+  PAID
+}
+
+enum WatermarkStatus {
+  QUEUED
+  PROCESSING
+  DONE
+  FAILED
+}
+
+enum TemplateType {
+  LANDING
+  SOCIAL_CAPTION
+  TIKTOK_SCRIPT
+}
+
+// models
+
+model User {
+  id               String   @id @default(cuid())
+  email            String   @unique
+  name             String?
+  stripeAccountId  String?
+  prefs            Json?
+  createdAt        DateTime @default(now())
+
+  products         Product[]
+  affiliateLinks   AffiliateLink[]
+}
+
+model Product {
+  id                 String         @id @default(cuid())
+  name               String
+  description        String?
+  coverUrl           String?
+  creatorId          String
+  creator            User           @relation(fields: [creatorId], references: [id])
+  defaultPriceCents  Int
+  currency           String         @default("usd")
+  commissionPercent  Int            @default(10)
+  tags               String[]
+  published          Boolean        @default(false)
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+
+  assets             ProductAsset[]
+  sales              Sale[]
+  affiliateLinks     AffiliateLink[]
+  events             FeedEvent[]
+  pricingRules       PricingRule[]
+  campaigns          Campaign[]
+}
+
+model ProductAsset {
+  id         String    @id @default(cuid())
+  productId  String
+  product    Product   @relation(fields: [productId], references: [id])
+  type       AssetType
+  fileUrl    String
+  fileName   String
+}
+
+model CampaignTemplate {
+  id               String        @id @default(cuid())
+  type             TemplateType
+  title            String
+  contentTemplate  String
+  placeholders     String[]
+  createdById      String?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+}
+
+model Campaign {
+  id             String   @id @default(cuid())
+  productId      String
+  product        Product  @relation(fields: [productId], references: [id])
+  landingHtml    String
+  socialCaptions String[]
+  tiktokScript   String
+  createdAt      DateTime @default(now())
+}
+
+model FeedEvent {
+  id         String    @id @default(cuid())
+  productId  String
+  product    Product   @relation(fields: [productId], references: [id])
+  userId     String?
+  type       EventType
+  createdAt  DateTime  @default(now())
+}
+
+model Sale {
+  id               String            @id @default(cuid())
+  productId        String
+  product          Product           @relation(fields: [productId], references: [id])
+  buyerEmail       String
+  buyerId          String?
+  priceCents       Int
+  currency         String
+  country          String?
+  transactionHash  String            @unique
+  affiliateLinkId  String?
+  affiliateLink    AffiliateLink?    @relation(fields: [affiliateLinkId], references: [id])
+  createdAt        DateTime          @default(now())
+  watermarkJob     WatermarkJob?
+  license          License?
+  commission       AffiliateCommission?
+}
+
+model AffiliateLink {
+  id                String               @id @default(cuid())
+  productId         String
+  product           Product              @relation(fields: [productId], references: [id])
+  code              String               @unique
+  userId            String?
+  user              User?                @relation(fields: [userId], references: [id])
+  commissionPercent Int?
+  clicks            AffiliateClick[]
+  commissions       AffiliateCommission[]
+  sales             Sale[]
+  createdAt         DateTime             @default(now())
+}
+
+model AffiliateClick {
+  id              String        @id @default(cuid())
+  affiliateLinkId String
+  affiliateLink   AffiliateLink @relation(fields: [affiliateLinkId], references: [id])
+  ip              String?
+  userAgent       String?
+  referer         String?
+  createdAt       DateTime      @default(now())
+}
+
+model AffiliateCommission {
+  id              String           @id @default(cuid())
+  affiliateLinkId String
+  affiliateLink   AffiliateLink    @relation(fields: [affiliateLinkId], references: [id])
+  saleId          String           @unique
+  sale            Sale             @relation(fields: [saleId], references: [id])
+  amountCents     Int
+  status          AffiliateStatus  @default(PENDING)
+  createdAt       DateTime         @default(now())
+  paidAt          DateTime?
+}
+
+model PricingRule {
+  id                      String    @id @default(cuid())
+  productId               String?
+  product                 Product?  @relation(fields: [productId], references: [id])
+  country                 String?
+  minDemand               Int?
+  timeStart               DateTime?
+  timeEnd                 DateTime?
+  salesVelocityThreshold  Int?
+  priceMultiplier         Float?
+  priceCents              Int?
+  priority                Int       @default(0)
+  active                  Boolean   @default(true)
+  createdAt               DateTime  @default(now())
+}
+
+model WatermarkJob {
+  id          String          @id @default(cuid())
+  saleId      String          @unique
+  sale        Sale            @relation(fields: [saleId], references: [id])
+  status      WatermarkStatus @default(QUEUED)
+  resultUrl   String?
+  licenseUrl  String?
+  error       String?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}
+
+model License {
+  id        String   @id @default(cuid())
+  saleId    String   @unique
+  sale      Sale     @relation(fields: [saleId], references: [id])
+  content   Json
+  url       String?
+  createdAt DateTime @default(now())
+}

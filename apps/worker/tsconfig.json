@@ -1,0 +1,19 @@
+{
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"outDir": "dist",
+		"module": "ESNext",
+		"target": "ES2020",
+		"moduleResolution": "Bundler",
+		"strict": true,
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"baseUrl": ".",
+		"paths": {
+			"@repo/db": ["../../packages/db/src/index.ts"],
+			"@repo/queue": ["../../packages/queue/src/index.ts"],
+			"@repo/watermark": ["../../packages/watermark/src/index.ts"]
+		}
+	},
+	"include": ["src"]
+}
