@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import Stripe from 'stripe';
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 
 export async function POST(req: NextRequest) {
 	const price = process.env.STRIPE_PRICE_ID;

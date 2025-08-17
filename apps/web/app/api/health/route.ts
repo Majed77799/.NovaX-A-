@@ -1,4 +1,4 @@
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 
 const headers = {
 	'Access-Control-Allow-Origin': process.env.NOVAX_CORS_ORIGIN ?? '*',

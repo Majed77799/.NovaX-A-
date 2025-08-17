@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "expo start --clear --non-interactive",
-    "build": "echo Expo Go build handled externally",
+    "build": "mkdir -p build && echo Expo Go build handled externally > build/NOTICE.txt",
     "lint": "echo noop",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
