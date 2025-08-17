@@ -14,7 +14,9 @@
     "paths": {
       "@repo/shared/*": ["packages/shared/src/*"],
       "@repo/ai/*": ["packages/ai/src/*"],
-      "@repo/api-client/*": ["packages/api-client/src/*"]
+      "@repo/api-client/*": ["packages/api-client/src/*"],
+      "@repo/db/*": ["packages/db/src/*"],
+      "@repo/db": ["packages/db/src/index.ts"]
     }
   }
 }

@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
+import FeedLink from './(components)/FeedLink';
 
 type Message = { id: string; role: 'user'|'assistant'|'system'; content: string };
 
@@ -95,6 +96,7 @@ export default function Page() {
 					<button className="btn" onClick={speakLast} aria-label="Speak">🔊</button>
 				</div>
 			</div>
+			<FeedLink />
 		</div>
 	);
 }

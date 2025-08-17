@@ -1,11 +1,35 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "jsx": "preserve",
-    "allowJs": true,
+    "target": "ES2020",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": false,
+    "skipLibCheck": true,
+    "strict": true,
     "noEmit": true,
-    "incremental": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
     "isolatedModules": true,
+    "jsx": "preserve",
+    "baseUrl": ".",
+    "paths": {
+      "@repo/ai": [
+        "../..//packages/ai/src"
+      ],
+      "@repo/shared": [
+        "../..//packages/shared/src"
+      ],
+      "@repo/db": [
+        "../..//packages/db/src"
+      ]
+    },
+    "incremental": true,
     "plugins": [
       {
         "name": "next"
@@ -16,8 +40,6 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "**/*.cjs",
-    "**/*.mjs",
     ".next/types/**/*.ts"
   ],
   "exclude": [
