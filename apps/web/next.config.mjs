@@ -15,7 +15,11 @@ export default withPWA({
 	transpilePackages: ['@repo/shared', '@repo/ai', '@repo/api-client'],
 	reactStrictMode: true,
 	eslint: { ignoreDuringBuilds: true },
-	api: { bodyParser: { sizeLimit: '1mb' } },
+	poweredByHeader: false,
+	compress: true,
+	compiler: {
+		removeConsole: { exclude: ['error', 'warn'] }
+	},
 	async headers() {
 		const corsOrigin = process.env.NOVAX_CORS_ORIGIN || '*';
 		return [
@@ -25,6 +29,18 @@ export default withPWA({
 					{ key: 'Access-Control-Allow-Origin', value: corsOrigin },
 					{ key: 'Access-Control-Allow-Methods', value: 'GET,POST,OPTIONS' },
 					{ key: 'Access-Control-Allow-Headers', value: 'Content-Type, Authorization' }
+				]
+			},
+			{
+				source: '/_next/static/:path*',
+				headers: [
+					{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }
+				]
+			},
+			{
+				source: '/icons/:path*',
+				headers: [
+					{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }
 				]
 			}
 		];
