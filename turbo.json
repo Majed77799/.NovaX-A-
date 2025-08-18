@@ -4,10 +4,11 @@
     "build": {
       "dependsOn": ["^build"],
       "outputs": ["dist/**", ".next/**", "build/**"],
-      "env": ["TURBO_REMOTE_CACHE_SIGNATURE", "NEXT_IMAGE_UNOPTIMIZED"]
+      "env": ["TURBO_REMOTE_CACHE_SIGNATURE", "NEXT_IMAGE_UNOPTIMIZED"],
+      "inputs": ["$TURBO_DEFAULT", "!**/*.md", "!**/*.spec.*", "!**/__tests__/**"]
     },
     "dev": { "cache": false },
-    "lint": {},
-    "typecheck": {}
+    "lint": { "outputs": [] },
+    "typecheck": { "outputs": [] }
   }
 }
