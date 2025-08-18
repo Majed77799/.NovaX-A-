@@ -1,0 +1,63 @@
+name: Benchmarks
+
+on:
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch: {}
+
+jobs:
+  bench:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install
+        run: npm install
+      - name: Build web
+        run: npm run build --workspaces --if-present
+      - name: Start Next.js
+        working-directory: apps/web
+        run: |
+          nohup npx next start -p 3000 >/dev/null 2>&1 & echo $! > ../../.bench/web.pid
+          sleep 3
+      - name: Run benchmarks (soft)
+        env:
+          BENCH_BASE_URL: http://localhost:3000
+          BENCH_FAIL_ON_BUDGET: '0'
+        run: |
+          node bench/run-all.js > .bench/results.json || true
+          echo "Results:" && cat .bench/results.json
+      - name: Render comment content
+        id: render
+        run: |
+          node -e "const fs=require('fs');const r=JSON.parse(fs.readFileSync('.bench/results.json','utf8'));console.log(JSON.stringify(r,null,2))" > .bench/comment.txt
+          echo "comment<<EOF" >> $GITHUB_OUTPUT
+          cat .bench/comment.txt >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+      - name: Comment PR with results
+        if: github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: perf-budgets
+          recreate: true
+          message: |
+            Performance Budgets
+            ```json
+            ${{ steps.render.outputs.comment }}
+            ```
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Stop Next.js
+        if: always()
+        run: |
+          kill $(cat .bench/web.pid) || true
+      - name: Enforce budgets (hard)
+        if: github.event_name == 'pull_request'
+        env:
+          BENCH_BASE_URL: http://localhost:3000
+          BENCH_FAIL_ON_BUDGET: '1'
+        run: node bench/run-all.js
