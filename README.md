@@ -41,3 +41,15 @@ npm run build
 - Add i18n auto-translate on the fly.
 - Add offline IndexedDB caching for messages/templates.
 - Polish animations and orb shader for Skia on mobile builds.
+
+## Migration and Performance PRs
+
+- chore(expo): upgrade to SDK 53 (light)
+  - Updates `apps/mobile/package.json` to Expo SDK 53 and `react-native@0.76.x`
+  - Enables Hermes and sets `runtimeVersion` in `apps/mobile/app.json`
+  - See `README.migrate-sdk53.md` for follow-up steps
+
+- perf: config-only speed pack
+  - Next.js: adds long-term caching headers, `swcMinify`, and `optimizePackageImports`
+  - Expo: Metro `inlineRequires` enabled
+  - See `PERF_NOTES.md` for follow-up checks
