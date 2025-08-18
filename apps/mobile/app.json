@@ -4,6 +4,8 @@
 		"slug": "ello-replica",
 		"scheme": "ello",
 		"version": "0.1.0",
+		"jsEngine": "hermes",
+		"runtimeVersion": "exposdk:53.0.0",
 		"orientation": "portrait",
 		"icon": "./assets/icon.png",
 		"splash": { "image": "./assets/splash.png", "resizeMode": "contain", "backgroundColor": "#ffffff" },
@@ -11,6 +13,7 @@
 		"assetBundlePatterns": ["**/*"],
 		"ios": { "supportsTablet": true },
 		"android": { "adaptiveIcon": { "foregroundImage": "./assets/adaptive-icon.png", "backgroundColor": "#FFFFFF" } },
-		"web": { "bundler": "metro", "favicon": "./assets/favicon.png" }
+		"web": { "bundler": "metro", "favicon": "./assets/favicon.png" },
+		"experiments": { "tsconfigPaths": true }
 	}
 }
