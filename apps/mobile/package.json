@@ -5,19 +5,19 @@
   "main": "index.js",
   "scripts": {
     "dev": "expo start --clear --non-interactive",
-    "build": "echo Expo Go build handled externally",
+    "build": "node scripts/build-output.js",
     "lint": "echo noop",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "expo": "~51.0.23",
-    "expo-constants": "~16.0.2",
-    "expo-haptics": "~13.0.1",
-    "expo-status-bar": "~1.12.1",
-    "expo-linear-gradient": "~13.0.2",
-    "react": "18.2.0",
-    "react-native": "0.74.3",
-    "expo-font": "~12.0.10"
+    "expo": "~53.0.0",
+    "expo-constants": "~16.0.3",
+    "expo-haptics": "~13.0.2",
+    "expo-status-bar": "~2.0.0",
+    "expo-linear-gradient": "~14.0.1",
+    "react": "18.3.1",
+    "react-native": "0.76.2",
+    "expo-font": "~13.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

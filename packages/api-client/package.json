@@ -9,9 +9,12 @@
     "build": "tsc -p tsconfig.json -d --emitDeclarationOnly",
     "lint": "echo noop",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "dev": "echo noop"
+    "dev": "echo noop",
+    "test": "jest --passWithNoTests"
   },
   "devDependencies": {
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.4"
   }
 }

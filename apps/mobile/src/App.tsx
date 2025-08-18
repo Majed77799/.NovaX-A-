@@ -3,6 +3,7 @@ import { Platform, SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, 
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import * as Font from 'expo-font';
+import Constants from 'expo-constants';
 
 const ORB_SIZE = 96;
 
@@ -16,6 +17,7 @@ export default function App() {
 	const [input, setInput] = useState('');
 	const [orb, setOrb] = useState<OrbState>('idle');
 	const scrollRef = useRef<ScrollView>(null);
+	const isQA = !!(Constants?.expoConfig?.extra as any)?.QA;
 
 	useEffect(() => {
 		Font.loadAsync({ Urbanist: require('./assets/Urbanist-VariableFont_wght.ttf') }).then(() => setFontLoaded(true));
@@ -42,7 +44,7 @@ export default function App() {
 				const { done, value } = await reader.read();
 				if (done) break;
 				const chunk = decoder.decode(value, { stream: true });
-				assistantMsg = { ...assistantMsg, content: assistantMsg.content + chunk };
+				assistantMsg = { ...assistantMsg, content: isQA ? `${assistantMsg.content}${chunk.toUpperCase()}` : `${assistantMsg.content}${chunk}` };
 				setMessages(prev => prev.map(m => m.id === assistantMsg.id ? assistantMsg : m));
 			}
 		} finally {

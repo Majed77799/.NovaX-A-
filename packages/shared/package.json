@@ -11,7 +11,7 @@
     "build": "tsc -p tsconfig.json -d --emitDeclarationOnly",
     "lint": "echo noop",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "dev": "echo noop"
+    "test": "jest --config jest.config.cjs --passWithNoTests"
   },
   "devDependencies": {
     "typescript": "^5.4.5"
