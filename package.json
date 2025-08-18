@@ -13,11 +13,18 @@
     "build": "turbo run build",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
-    "format": "turbo run format"
+    "format": "turbo run format",
+    "bench:api:feed": "node bench/api-feed.js",
+    "bench:api:pricing": "node bench/api-pricing.js",
+    "bench:web:ttfb": "node bench/web-ttfb.js",
+    "bench:mobile": "bash bench/mobile-bundle.sh",
+    "bench:all": "node bench/run-all.js"
   },
   "devDependencies": {
     "turbo": "^2.0.3",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "autocannon": "^7.14.0",
+    "undici": "^6.19.8"
   },
   "packageManager": "npm@10.9.2"
 }
