@@ -68,7 +68,7 @@ for ROW in $(echo "$PRS_JSON" | jq -r '.[] | @base64'); do
   TITLE=$(_jq '.title')
   BODY=$(_jq '.body // ""')
 
-  if echo "$BODY" | grep -qEi '^\s*#\{2,6\}\s*Health Gate\s*$'; then
+  if echo "$BODY" | grep -qEi '^\s*#{2,6}\s*Health Gate\s*$'; then
     echo "#${NUMBER} already has Health Gate section. Skipping."
     continue
   fi
