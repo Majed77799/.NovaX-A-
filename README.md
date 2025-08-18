@@ -41,3 +41,10 @@ npm run build
 - Add i18n auto-translate on the fly.
 - Add offline IndexedDB caching for messages/templates.
 - Polish animations and orb shader for Skia on mobile builds.
+
+## Docs
+
+- [Architecture](./docs/ARCHITECTURE.md)
+- [Features Matrix](./docs/FEATURES_MATRIX.md)
+- [Operations](./docs/OPERATIONS.md)
+- [Onboarding](./docs/ONBOARDING.md)
