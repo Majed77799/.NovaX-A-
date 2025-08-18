@@ -6,6 +6,14 @@
 - install at repo root: `npm install`
 - dev: `npm run dev:web`
 
+### Analyze bundle
+
+Set `ANALYZE=true` to visualize client and server bundles with `@next/bundle-analyzer`:
+
+```
+ANALYZE=true npm run dev:web
+```
+
 ## Build
 
 - `npm run build`

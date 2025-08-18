@@ -10,7 +10,12 @@
 		"updates": { "fallbackToCacheTimeout": 0 },
 		"assetBundlePatterns": ["**/*"],
 		"ios": { "supportsTablet": true },
-		"android": { "adaptiveIcon": { "foregroundImage": "./assets/adaptive-icon.png", "backgroundColor": "#FFFFFF" } },
+		"android": {
+			"adaptiveIcon": { "foregroundImage": "./assets/adaptive-icon.png", "backgroundColor": "#FFFFFF" },
+			"enableDangerousExperimentalLeanBuilds": false,
+			"runtimeVersion": { "policy": "sdkVersion" },
+			"softwareKeyboardLayoutMode": "pan"
+		},
 		"web": { "bundler": "metro", "favicon": "./assets/favicon.png" }
 	}
 }

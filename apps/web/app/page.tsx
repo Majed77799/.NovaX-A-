@@ -1,6 +1,10 @@
 "use client";
 import { useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
+import dynamic from 'next/dynamic';
+
+// Defer optional UI chunk as an example
+const InputBar = dynamic(() => import('./(components)/InputBar').then(m => m.InputBar), { ssr: false, loading: () => null });
 
 type Message = { id: string; role: 'user'|'assistant'|'system'; content: string };
 
@@ -75,26 +79,7 @@ export default function Page() {
 					<div key={m.id} className={clsx('bubble', m.role === 'assistant' ? 'assistant' : 'user')}>{m.content}</div>
 				))}
 			</div>
-			<div className="input-bar">
-				<div className="input-shell">
-					<div className="quick-actions">
-						<button className="quick-chip btn" onClick={() => send('Summarize my day in 3 bullet points.')}>Summarize</button>
-						<button className="quick-chip btn" onClick={() => send('Translate the last message to Spanish.')}>Translate</button>
-						<button className="quick-chip btn" onClick={() => send('Create a to-do list for this week.')}>To‑do</button>
-					</div>
-					<textarea
-						className="input"
-						rows={1}
-						value={input}
-						onChange={e => setInput(e.target.value)}
-						onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(input); } }}
-						placeholder="Message Ello"
-						aria-label="Message Ello"
-					/>
-					<button className="btn" onClick={() => send(input)} aria-label="Send">➤</button>
-					<button className="btn" onClick={speakLast} aria-label="Speak">🔊</button>
-				</div>
-			</div>
+			<InputBar onSend={send} />
 		</div>
 	);
 }

@@ -1,5 +1,12 @@
 "use client";
 import { useState } from 'react';
+import dynamic from 'next/dynamic';
+
+// Example: route-level dynamic import of a heavy component (charts, editors, etc.)
+const HeavyCharts = dynamic(() => import('../(components)/HeavyCharts'), {
+	ssr: false,
+	loading: () => <div style={{ opacity: 0.6 }}>Loading analytics…</div>
+});
 
 export default function Settings() {
 	const [theme, setTheme] = useState<'system'|'light'|'dark'>('system');
@@ -41,6 +48,10 @@ export default function Settings() {
 				<section>
 					<h3>Debug</h3>
 					<p>Status OK.</p>
+				</section>
+				<section>
+					<h3>Usage analytics (lazy)</h3>
+					<HeavyCharts />
 				</section>
 			</div>
 		</div>

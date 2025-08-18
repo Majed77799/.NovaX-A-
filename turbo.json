@@ -3,7 +3,8 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", ".next/**", "build/**"]
+      "outputs": ["dist/**", ".next/**", "build/**"],
+      "env": ["TURBO_REMOTE_CACHE_SIGNATURE", "NEXT_IMAGE_UNOPTIMIZED"]
     },
     "dev": { "cache": false },
     "lint": {},

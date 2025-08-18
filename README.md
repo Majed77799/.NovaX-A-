@@ -41,3 +41,8 @@ npm run build
 - Add i18n auto-translate on the fly.
 - Add offline IndexedDB caching for messages/templates.
 - Polish animations and orb shader for Skia on mobile builds.
+
+## Performance
+- Web bundle analyzer: `ANALYZE=true npm run dev:web`
+- Toggle Next Image optimization: set `NEXT_IMAGE_UNOPTIMIZED=true` for environments without sharp/libvips
+- Expo Metro: inline requires via Babel; optional MMKV cache behind `MMKV_ENABLED=true`

@@ -17,11 +17,42 @@ export default function App() {
 	const [orb, setOrb] = useState<OrbState>('idle');
 	const scrollRef = useRef<ScrollView>(null);
 
+	// Optional fast key-value cache behind feature flag
+	const mmkvEnabled = process.env.MMKV_ENABLED === 'true';
+	useEffect(() => {
+		if (!mmkvEnabled) return;
+		(async () => {
+			try {
+				const { MMKV } = await import('react-native-mmkv');
+				const storage = new MMKV();
+				const raw = storage.getString('messages');
+				if (raw) setMessages(JSON.parse(raw));
+				return () => {
+					// save last messages on unmount
+					try { storage.set('messages', JSON.stringify(messages.slice(-50))); } catch {}
+				};
+			} catch {}
+		})();
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
+
 	useEffect(() => {
 		Font.loadAsync({ Urbanist: require('./assets/Urbanist-VariableFont_wght.ttf') }).then(() => setFontLoaded(true));
 	}, []);
 
 	useEffect(() => { scrollRef.current?.scrollToEnd({ animated: true }); }, [messages.length]);
+
+	// Persist last messages if MMKV is enabled
+	useEffect(() => {
+		if (process.env.MMKV_ENABLED !== 'true') return;
+		(async () => {
+			try {
+				const { MMKV } = await import('react-native-mmkv');
+				const storage = new MMKV();
+				storage.set('messages', JSON.stringify(messages.slice(-50)));
+			} catch {}
+		})();
+	}, [messages]);
 
 	async function send(text: string) {
 		if (!text.trim()) return;

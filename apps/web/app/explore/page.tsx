@@ -1,5 +1,9 @@
 "use client";
 import { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
+
+// Example of dynamic import for a heavy client component in this route
+const HeavyCharts = dynamic(() => import('../(components)/HeavyCharts'), { ssr: false });
 
 export default function Explore() {
 	const [items, setItems] = useState<{ id: string; title: string; prompt: string }[]>([]);
@@ -21,6 +25,9 @@ export default function Explore() {
 						<p style={{ margin: 0, opacity: 0.8 }}>{it.prompt}</p>
 					</div>
 				))}
+			</div>
+			<div style={{ marginTop: 16 }}>
+				<HeavyCharts />
 			</div>
 		</div>
 	);
