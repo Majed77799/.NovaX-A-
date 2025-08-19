@@ -5,6 +5,9 @@
     "preview": { "distribution": "internal" },
     "production": {}
   },
+  "update": {
+    "channel": "preview"
+  },
   "submit": {
     "production": {}
   }
