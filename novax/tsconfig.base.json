@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ES2021",
+    "module": "ESNext",
+    "jsx": "react-jsx",
+    "strict": true,
+    "noEmit": true,
+    "moduleResolution": "Bundler",
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "allowJs": false,
+    "baseUrl": ".",
+    "paths": {
+      "@novax/ui": ["packages/ui/src"],
+      "@novax/ui/*": ["packages/ui/src/*"],
+      "@novax/core": ["packages/core/src"],
+      "@novax/core/*": ["packages/core/src/*"]
+    }
+  },
+  "exclude": ["node_modules", "dist", "build", ".next", "web-build", "ios", "android"]
+}
