@@ -7,20 +7,23 @@
     "dev": "expo start --clear --non-interactive",
     "build": "echo Expo Go build handled externally",
     "lint": "echo noop",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "publish:preview": "eas update --branch preview --message 'Preview update' --auto"
   },
   "dependencies": {
     "expo": "~51.0.23",
     "expo-constants": "~16.0.2",
+    "expo-font": "~12.0.10",
     "expo-haptics": "~13.0.1",
-    "expo-status-bar": "~1.12.1",
     "expo-linear-gradient": "~13.0.2",
+    "expo-status-bar": "~1.12.1",
     "react": "18.2.0",
-    "react-native": "0.74.3",
-    "expo-font": "~12.0.10"
+    "react-native": "0.74.3"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
+    "@expo/ngrok": "^4.1.3",
+    "eas-cli": "^16.17.4",
     "typescript": "^5.4.5"
   }
 }
