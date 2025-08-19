@@ -11,20 +11,23 @@
     "publish:preview": "eas update --branch preview --message 'Preview update' --auto"
   },
   "dependencies": {
-    "expo": "~51.0.23",
-    "expo-constants": "~16.0.2",
-    "expo-font": "~12.0.10",
-    "expo-haptics": "~13.0.1",
-    "expo-linear-gradient": "~13.0.2",
-    "expo-status-bar": "~1.12.1",
-    "react": "18.2.0",
-    "react-native": "0.74.3",
-    "expo-updates": "~0.25.28"
+    "expo": "~53.0.0",
+    "expo-constants": "~17.1.7",
+    "expo-font": "~13.3.2",
+    "expo-haptics": "~14.1.4",
+    "expo-linear-gradient": "~14.1.5",
+    "expo-status-bar": "~2.2.3",
+    "react": "19.0.0",
+    "react-native": "0.79.5",
+    "expo-updates": "~0.28.17",
+    "expo-splash-screen": "~0.30.10",
+    "typescript": "~5.8.3"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@expo/ngrok": "^4.1.3",
-    "eas-cli": "^16.17.4",
-    "typescript": "^5.4.5"
+    "typescript": "~5.8.3",
+    "@expo/config-plugins": "~10.1.2",
+    "@expo/prebuild-config": "~9.0.11"
   }
 }
