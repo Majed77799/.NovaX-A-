@@ -16,8 +16,12 @@
     "format": "turbo run format"
   },
   "devDependencies": {
+    "metro": "^0.81.5",
     "turbo": "^2.0.3",
     "typescript": "^5.4.5"
   },
-  "packageManager": "npm@10.9.2"
+  "packageManager": "npm@10.9.2",
+  "volta": {
+    "node": "20.19.4"
+  }
 }
