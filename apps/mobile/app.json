@@ -1,15 +1,32 @@
 {
-	"expo": {
-		"name": "Ello",
-		"slug": "ello-replica",
-		"scheme": "ello",
-		"version": "0.1.0",
-		"orientation": "portrait",
-		"updates": { "fallbackToCacheTimeout": 0 },
-		"runtimeVersion": { "policy": "sdkVersion" },
-		"assetBundlePatterns": ["**/*"],
-		"ios": { "supportsTablet": true },
-		"android": {},
-		"web": { "bundler": "metro" }
-	}
+  "expo": {
+    "name": "Ello",
+    "slug": "ello-replica",
+    "scheme": "ello",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "updates": {
+      "fallbackToCacheTimeout": 0,
+      "url": "https://u.expo.dev/8bf47054-2f13-4ed8-9791-2dda71064779"
+    },
+    "runtimeVersion": {
+      "policy": "sdkVersion"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {},
+    "web": {
+      "bundler": "metro"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "8bf47054-2f13-4ed8-9791-2dda71064779"
+      }
+    },
+    "owner": "arashmajed"
+  }
 }
