@@ -1,100 +1,49 @@
 "use client";
-import { useEffect, useRef, useState } from 'react';
-import clsx from 'clsx';
-
-type Message = { id: string; role: 'user'|'assistant'|'system'; content: string };
-
-type OrbState = 'idle'|'thinking'|'speaking';
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { Orb } from './(components)/Orb';
 
 export default function Page() {
-	const [messages, setMessages] = useState<Message[]>([]);
-	const [input, setInput] = useState('');
-	const [orb, setOrb] = useState<OrbState>('idle');
-	const listRef = useRef<HTMLDivElement>(null);
-	const abortRef = useRef<AbortController | null>(null);
-
+	const [showModal, setShowModal] = useState(false);
 	useEffect(() => {
-		try {
-			const raw = localStorage.getItem('messages');
-			if (raw) setMessages(JSON.parse(raw));
-		} catch {}
+		// preload client init if needed
 	}, []);
-	useEffect(() => {
-		try { localStorage.setItem('messages', JSON.stringify(messages)); } catch {}
-	}, [messages]);
-
-	useEffect(() => { listRef.current?.lastElementChild?.scrollIntoView({ behavior: 'smooth' }); }, [messages.length]);
-
-	async function send(text: string) {
-		if (!text.trim()) return;
-		const userMsg: Message = { id: crypto.randomUUID(), role: 'user', content: text.trim() };
-		setMessages(prev => [...prev, userMsg]);
-		setInput('');
-		setOrb('thinking');
-		abortRef.current?.abort();
-		const controller = new AbortController();
-		abortRef.current = controller;
-		fetch('/api/analytics', { method: 'POST', body: JSON.stringify({ t: 'message', len: text.length }), headers: { 'Content-Type': 'application/json' } }).catch(()=>{});
-		const res = await fetch('/api/chat', { method: 'POST', body: JSON.stringify({ messages: [...messages, userMsg] }), headers: { 'Content-Type': 'application/json' }, signal: controller.signal });
-		if (!res.ok || !res.body) { setOrb('idle'); return; }
-		const reader = res.body.getReader();
-		const decoder = new TextDecoder();
-		let assistantMsg: Message = { id: crypto.randomUUID(), role: 'assistant', content: '' };
-		setMessages(prev => [...prev, assistantMsg]);
-		setOrb('speaking');
-		while (true) {
-			const { done, value } = await reader.read();
-			if (done) break;
-			const chunk = decoder.decode(value, { stream: true });
-			assistantMsg = { ...assistantMsg, content: assistantMsg.content + chunk };
-			setMessages(prev => prev.map(m => (m.id === assistantMsg.id ? assistantMsg : m)));
-		}
-		setOrb('idle');
+	function onGetStarted() {
+		try { document.cookie = 'novax_auth=1; path=/; max-age=86400'; } catch {}
+		setShowModal(false);
+		window.location.href = '/dashboard';
 	}
-
-	async function speakLast() {
-		const last = [...messages].reverse().find(m => m.role === 'assistant');
-		if (!last) return;
-		setOrb('speaking');
-		try {
-			const res = await fetch('/api/tts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: last.content }) });
-			const buf = await res.arrayBuffer();
-			const blob = new Blob([buf], { type: 'audio/mpeg' });
-			const url = URL.createObjectURL(blob);
-			const audio = new Audio(url);
-			audio.onended = () => { setOrb('idle'); URL.revokeObjectURL(url); };
-			audio.play();
-		} catch { setOrb('idle'); }
-	}
-
 	return (
-		<div className="container">
-			<div className={clsx('orb', orb)} aria-label={`assistant ${orb}`} />
-			<div className="chat" ref={listRef}>
-				{messages.map(m => (
-					<div key={m.id} className={clsx('bubble', m.role === 'assistant' ? 'assistant' : 'user')}>{m.content}</div>
-				))}
+		<div className="container" style={{ paddingTop: 40, paddingBottom: 60 }}>
+			<Orb state="idle" />
+			<h1 style={{ marginTop: 16, fontSize: 36, fontWeight: 700 }}>NovaX — Playful SaaS, Serious Power</h1>
+			<p style={{ marginTop: 8, opacity: 0.9 }}>Build faster with delightful templates and a buttery‑smooth workflow.</p>
+			<div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
+				<button className="btn" onClick={() => setShowModal(true)}>Get Started</button>
+				<Link className="btn" href="/marketplace">Explore Marketplace</Link>
 			</div>
-			<div className="input-bar">
-				<div className="input-shell">
-					<div className="quick-actions">
-						<button className="quick-chip btn" onClick={() => send('Summarize my day in 3 bullet points.')}>Summarize</button>
-						<button className="quick-chip btn" onClick={() => send('Translate the last message to Spanish.')}>Translate</button>
-						<button className="quick-chip btn" onClick={() => send('Create a to-do list for this week.')}>To‑do</button>
-					</div>
-					<textarea
-						className="input"
-						rows={1}
-						value={input}
-						onChange={e => setInput(e.target.value)}
-						onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(input); } }}
-						placeholder="Message Ello"
-						aria-label="Message Ello"
-					/>
-					<button className="btn" onClick={() => send(input)} aria-label="Send">➤</button>
-					<button className="btn" onClick={speakLast} aria-label="Speak">🔊</button>
+			<div className="card" style={{ marginTop: 24 }}>
+				<div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8 }}>
+					<span className="badge">Creator Lv.3</span>
+					<span className="badge">Top 10%</span>
+					<span className="badge">Streak x5</span>
+				</div>
+				<div style={{ height: 10, borderRadius: 6, background: 'rgba(15,18,35,0.1)' }}>
+					<div style={{ width: '72%', height: '100%', borderRadius: 6, background: 'linear-gradient(90deg, #A78BFA, #34D399)' }} />
 				</div>
 			</div>
+			{showModal && (
+				<div className="modal" role="dialog" aria-modal="true">
+					<div className="modal-content">
+						<h3>Sign in</h3>
+						<p style={{ marginTop: 6 }}>This is a demo. Continue to enter the dashboard.</p>
+						<div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+							<button className="btn" onClick={onGetStarted}>Continue</button>
+							<button className="btn" onClick={() => setShowModal(false)}>Cancel</button>
+						</div>
+					</div>
+				</div>
+			)}
 		</div>
 	);
 }

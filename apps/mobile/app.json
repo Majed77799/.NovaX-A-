@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "Ello",
+    "name": "NovaX",
     "slug": "ello-replica",
-    "scheme": "ello",
+    "scheme": "novax",
     "version": "0.1.0",
     "orientation": "portrait",
     "updates": {
@@ -16,9 +16,16 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "runtimeVersion": {
+        "policy": "sdkVersion"
+      }
     },
-    "android": {},
+    "android": {
+      "runtimeVersion": {
+        "policy": "sdkVersion"
+      }
+    },
     "web": {
       "bundler": "metro"
     },
