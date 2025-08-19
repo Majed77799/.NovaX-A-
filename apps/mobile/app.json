@@ -8,8 +8,8 @@
 		"updates": { "fallbackToCacheTimeout": 0 },
 		"runtimeVersion": { "policy": "sdkVersion" },
 		"assetBundlePatterns": ["**/*"],
-		"ios": { "supportsTablet": true },
-		"android": {},
+		"ios": { "supportsTablet": true, "bundleIdentifier": "com.novax.ello" },
+		"android": { "package": "com.novax.ello" },
 		"web": { "bundler": "metro" }
 	}
 }
