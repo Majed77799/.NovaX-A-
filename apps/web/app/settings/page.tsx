@@ -1,11 +1,22 @@
 "use client";
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function Settings() {
 	const [theme, setTheme] = useState<'system'|'light'|'dark'>('system');
 	const [fontSize, setFontSize] = useState<number>(16);
 	const [language, setLanguage] = useState<string>('auto');
 	const [voice, setVoice] = useState<string>('alloy');
+
+	useEffect(() => {
+		try {
+			const saved = localStorage.getItem('novax.theme');
+			if (saved === 'light' || saved === 'dark' || saved === 'system') setTheme(saved);
+		} catch {}
+	}, []);
+	useEffect(() => {
+		try { localStorage.setItem('novax.theme', theme); } catch {}
+	}, [theme]);
+
 	return (
 		<div className="container" style={{ paddingTop: 32 }}>
 			<h2>Settings</h2>
@@ -39,8 +50,9 @@ export default function Settings() {
 					<p>Set on server via environment variables.</p>
 				</section>
 				<section>
-					<h3>Debug</h3>
-					<p>Status OK.</p>
+					<h3>Docs</h3>
+					<p><a href="https://expo.dev" target="_blank" rel="noreferrer">Expo Docs</a></p>
+					<p><a href="https://nextjs.org" target="_blank" rel="noreferrer">Next.js Docs</a></p>
 				</section>
 			</div>
 		</div>

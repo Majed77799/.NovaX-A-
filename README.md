@@ -1,20 +1,20 @@
-# Ello Perfect Replica (Web + Mobile)
+# NovaX (Web + Mobile)
 
-Monorepo with Next.js 14 PWA (`apps/web`) and Expo Go app (`apps/mobile`), plus shared packages for AI orchestration and utilities.
+Monorepo with Next.js 14 App Router (`apps/web`) and Expo SDK 53 app (`apps/mobile`), plus shared packages (`packages/*`).
 
 ## Install
 
 ```bash
-npm install
+pnpm install
 ```
 
 ## Dev
 
 ```bash
 # Web
-npm run dev:web
+pnpm run dev:web
 # Mobile (Expo Go)
-npm run dev:mobile
+pnpm run dev:mobile
 ```
 
 Set environment variables: copy `.env.example` to `.env.local` (for web) or your host.
@@ -22,8 +22,21 @@ Set environment variables: copy `.env.example` to `.env.local` (for web) or your
 ## Build
 
 ```bash
-npm run build
+pnpm run build
 ```
+
+### How to preview in Expo Go (SDK 53)
+
+1. Ensure dependencies are installed: `pnpm install`
+2. Align Expo SDK versions: `pnpm --filter @novax/mobile exec npx expo install`
+3. Start dev server: `pnpm run dev:mobile`
+4. Scan the QR with Expo Go app (iOS/Android). Hermes and inlineRequires are enabled for perf.
+
+### Commands
+
+- Lint: `pnpm run lint`
+- Typecheck: `pnpm run typecheck`
+- Build web: `pnpm --filter web run build`
 
 ## Skia vs SVG orb
 - Default: CSS/SVG glow orb for universal parity and 60fps without native modules.
