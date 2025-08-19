@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
 		try {
 			const last = body.messages[body.messages.length - 1];
 			const userLang = detectLanguage(last?.content ?? '');
-			const systemMsg = { role: 'system' as const, content: `You are Ello. Always reply in ${userLang}. Keep responses concise and helpful.` };
+			const systemMsg = { role: 'system' as const, content: `You are NovaX. Always reply in ${userLang}. Keep responses concise and helpful.` };
 
 			const hasAnyKey = !!(process.env.OPENAI_API_KEY || process.env.ANTHROPIC_API_KEY || process.env.GOOGLE_API_KEY);
 			if (!hasAnyKey) {

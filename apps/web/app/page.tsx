@@ -69,15 +69,15 @@ export default function Page() {
 
 	return (
 		<div className="container">
-			<div className={clsx('orb', orb)} aria-label={`assistant ${orb}`} />
-			<div className="chat" ref={listRef}>
+			<div className={clsx('orb', orb)} role="img" aria-label={`assistant ${orb}`} aria-hidden={orb==='idle'} />
+			<div className="chat" ref={listRef} role="log" aria-live="polite" aria-relevant="additions">
 				{messages.map(m => (
 					<div key={m.id} className={clsx('bubble', m.role === 'assistant' ? 'assistant' : 'user')}>{m.content}</div>
 				))}
 			</div>
 			<div className="input-bar">
 				<div className="input-shell">
-					<div className="quick-actions">
+											<div className="quick-actions" role="toolbar" aria-label="Quick actions">
 						<button className="quick-chip btn" onClick={() => send('Summarize my day in 3 bullet points.')}>Summarize</button>
 						<button className="quick-chip btn" onClick={() => send('Translate the last message to Spanish.')}>Translate</button>
 						<button className="quick-chip btn" onClick={() => send('Create a to-do list for this week.')}>To‑do</button>
@@ -88,10 +88,10 @@ export default function Page() {
 						value={input}
 						onChange={e => setInput(e.target.value)}
 						onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(input); } }}
-						placeholder="Message Ello"
-						aria-label="Message Ello"
+						placeholder="Message NovaX"
+						aria-label="Message NovaX"
 					/>
-					<button className="btn" onClick={() => send(input)} aria-label="Send">➤</button>
+											<button className="btn" onClick={() => send(input)} aria-label="Send" title="Send (Enter)">➤</button>
 					<button className="btn" onClick={speakLast} aria-label="Speak">🔊</button>
 				</div>
 			</div>

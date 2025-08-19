@@ -1,11 +1,41 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function Settings() {
 	const [theme, setTheme] = useState<'system'|'light'|'dark'>('system');
 	const [fontSize, setFontSize] = useState<number>(16);
 	const [language, setLanguage] = useState<string>('auto');
 	const [voice, setVoice] = useState<string>('alloy');
+
+	const applySettings = (t: 'system'|'light'|'dark', size: number) => {
+		const root = document.documentElement;
+		root.style.setProperty('--font-size', `${size}px`);
+		if (t === 'system') {
+			root.removeAttribute('data-theme');
+		} else {
+			root.setAttribute('data-theme', t);
+		}
+	};
+
+	useEffect(() => {
+		try {
+			const raw = localStorage.getItem('novax:settings');
+			if (raw) {
+				const s = JSON.parse(raw);
+				setTheme(s.theme ?? 'system');
+				setFontSize(s.fontSize ?? 16);
+				setLanguage(s.language ?? 'auto');
+				setVoice(s.voice ?? 'alloy');
+				applySettings(s.theme ?? 'system', s.fontSize ?? 16);
+			}
+		} catch {}
+	}, []);
+
+	useEffect(() => {
+		applySettings(theme, fontSize);
+		try { localStorage.setItem('novax:settings', JSON.stringify({ theme, fontSize, language, voice })); } catch {}
+	}, [theme, fontSize, language, voice]);
+
 	return (
 		<div className="container" style={{ paddingTop: 32 }}>
 			<h2>Settings</h2>
