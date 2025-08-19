@@ -27,6 +27,9 @@
         "projectId": "8bf47054-2f13-4ed8-9791-2dda71064779"
       }
     },
-    "owner": "arashmajed"
+    "owner": "arashmajed",
+    "plugins": [
+      "expo-font"
+    ]
   }
 }
