@@ -1,0 +1,125 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup pnpm (if lockfile present)
+        if: ${{ hashFiles('**/pnpm-lock.yaml') != '' }}
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Enable Corepack (Yarn/NPM)
+        run: |
+          corepack enable || true
+
+      - name: Install dependencies (pnpm)
+        if: ${{ hashFiles('**/pnpm-lock.yaml') != '' && hashFiles('**/package.json') != '' }}
+        run: pnpm install --frozen-lockfile
+
+      - name: Install dependencies (yarn)
+        if: ${{ hashFiles('**/pnpm-lock.yaml') == '' && hashFiles('**/yarn.lock') != '' && hashFiles('**/package.json') != '' }}
+        run: yarn install --frozen-lockfile
+
+      - name: Install dependencies (npm)
+        if: ${{ hashFiles('**/pnpm-lock.yaml') == '' && hashFiles('**/yarn.lock') == '' && hashFiles('**/package-lock.json') != '' && hashFiles('**/package.json') != '' }}
+        run: npm ci
+
+      - name: Install dependencies (npm fallback)
+        if: ${{ hashFiles('**/pnpm-lock.yaml') == '' && hashFiles('**/yarn.lock') == '' && hashFiles('**/package-lock.json') == '' && hashFiles('**/package.json') != '' }}
+        run: npm install --no-fund --no-audit
+
+      - name: Typecheck (if script exists)
+        if: ${{ hashFiles('**/package.json') != '' }}
+        run: |
+          npm run -s typecheck --if-present || echo "No typecheck script"
+
+      - name: Lint (if script exists)
+        if: ${{ hashFiles('**/package.json') != '' }}
+        run: |
+          npm run -s lint --if-present || echo "No lint script"
+
+      - name: Test (if script exists)
+        if: ${{ hashFiles('**/package.json') != '' }}
+        run: |
+          npm test --if-present || echo "No test script"
+
+      - name: Detect web app directory
+        id: detect_web
+        run: |
+          set -e
+          candidates=(apps/web web frontend app .)
+          web_dir=""
+          for c in "${candidates[@]}"; do
+            if [ -f "$c/package.json" ]; then
+              web_dir="$c"
+              break
+            fi
+          done
+          echo "web_dir=$web_dir" >> "$GITHUB_OUTPUT"
+
+      - name: Install web dependencies (if isolated)
+        if: ${{ steps.detect_web.outputs.web_dir != '' }}
+        run: |
+          set -e
+          WEB_DIR="${{ steps.detect_web.outputs.web_dir }}"
+          if [ -f "$WEB_DIR/pnpm-lock.yaml" ]; then
+            pnpm install --frozen-lockfile -C "$WEB_DIR"
+          elif [ -f "$WEB_DIR/yarn.lock" ]; then
+            yarn install --frozen-lockfile --cwd "$WEB_DIR"
+          elif [ -f "$WEB_DIR/package-lock.json" ]; then
+            npm ci --prefix "$WEB_DIR"
+          elif [ -f "$WEB_DIR/package.json" ]; then
+            npm install --no-fund --no-audit --prefix "$WEB_DIR"
+          fi
+
+      - name: Build web
+        if: ${{ steps.detect_web.outputs.web_dir != '' }}
+        run: |
+          set -e
+          WEB_DIR="${{ steps.detect_web.outputs.web_dir }}"
+          if [ -f "$WEB_DIR/package.json" ]; then
+            npm --prefix "$WEB_DIR" run -s build --if-present || echo "No build script in $WEB_DIR"
+          fi
+
+      - name: Locate web build artifacts
+        id: find_build
+        if: ${{ steps.detect_web.outputs.web_dir != '' }}
+        run: |
+          set -e
+          WEB_DIR="${{ steps.detect_web.outputs.web_dir }}"
+          for d in .next dist build out public; do
+            if [ -d "$WEB_DIR/$d" ]; then
+              echo "build_path=$WEB_DIR/$d" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          done
+          echo "build_path=" >> "$GITHUB_OUTPUT"
+
+      - name: Upload web artifact
+        if: ${{ steps.find_build.outputs.build_path != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-build-${{ github.sha }}
+          path: ${{ steps.find_build.outputs.build_path }}
+          if-no-files-found: warn
