@@ -1,0 +1,24 @@
+{
+  "tasks": [
+    {
+      "id": "build-service-A",
+      "priority": 20,
+      "dependencies": [],
+      "steps": [
+        { "name": "build", "cmd": "echo 'Building A' && sleep 1" },
+        { "name": "deploy", "cmd": "echo 'Deploying A' && sleep 1" },
+        { "name": "optimize", "cmd": "echo 'Optimizing A' && sleep 1" }
+      ]
+    },
+    {
+      "id": "build-service-B",
+      "priority": 10,
+      "dependencies": ["build-service-A"],
+      "steps": [
+        { "name": "build", "cmd": "echo 'Building B' && sleep 1" },
+        { "name": "deploy", "cmd": "echo 'Deploying B' && sleep 1" },
+        { "name": "optimize", "cmd": "echo 'Optimizing B' && sleep 1" }
+      ]
+    }
+  ]
+}
