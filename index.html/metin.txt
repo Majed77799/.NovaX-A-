@@ -95,34 +95,519 @@
     footer a:hover {
       text-decoration: underline;
     }
+
+    /* Tabs */
+    .tabs {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.15);
+      box-shadow: 0 6px 24px rgba(0,0,0,0.25);
+    }
+    .tab-btn {
+      background: transparent;
+      color: #e6ecff;
+      border: 0;
+      padding: 10px 16px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 700;
+      letter-spacing: .4px;
+      transition: transform 200ms ease, background 200ms ease, color 200ms ease;
+      will-change: transform;
+    }
+    .tab-btn:hover { transform: scale(0.98); }
+    .tab-btn.active {
+      background: linear-gradient(90deg, rgba(106,167,255,.2), rgba(178,106,255,.2));
+      color: #ffffff;
+    }
+
+    /* Panels */
+    .panel {
+      display: none;
+      opacity: 0;
+      transform: translateY(6px);
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 10px 20px 30px;
+    }
+    .panel.active { display: block; animation: fadeSlide 280ms ease forwards; }
+
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section-title {
+      font-size: 1.2rem;
+      color: #cfe1ff;
+      letter-spacing: .5px;
+      margin: 18px 0 8px;
+    }
+
+    /* KPI cards - glass panels with micro-shadows */
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      padding: 12px 0 6px;
+    }
+    .kpi-card {
+      position: relative;
+      backdrop-filter: blur(10px);
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 14px;
+      padding: 14px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25), 0 2px 6px rgba(0,0,0,0.2);
+      transition: transform 200ms ease, box-shadow 200ms ease;
+      will-change: transform, box-shadow;
+    }
+    .kpi-card:hover { transform: scale(0.98); box-shadow: 0 16px 40px rgba(0,0,0,0.35); }
+    .kpi-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(120% 100% at 10% 0%, rgba(255,255,255,0.15), transparent 60%),
+                  radial-gradient(80% 80% at 90% 100%, rgba(255,255,255,0.06), transparent 60%);
+      border-radius: 14px;
+    }
+    .kpi-title { font-size: 12px; color: #b9c2e6; margin: 0 0 6px; }
+    .metric { font-size: 28px; font-weight: 800; letter-spacing: .5px; }
+    .metric small { font-size: 12px; color: #b9c2e6; font-weight: 600; }
+
+    /* Charts */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 10px;
+    }
+    .chart-card {
+      position: relative;
+      backdrop-filter: blur(10px);
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 14px;
+      padding: 12px 12px 6px;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.25);
+      transition: transform 200ms ease, box-shadow 200ms ease;
+    }
+    .chart-card:hover { transform: scale(0.98); box-shadow: 0 14px 36px rgba(0,0,0,0.33); }
+    .chart-card h4 { margin: 0 0 8px; font-size: 14px; color: #e6ecff; }
+    .chart-card canvas { width: 100% !important; height: 260px !important; }
+    #geoCanvas { height: 320px !important; }
+
+    .controls { display: inline-flex; gap: 6px; margin-bottom: 8px; }
+    .range-btn {
+      background: rgba(255,255,255,0.08);
+      color: #cfe1ff;
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 999px;
+      padding: 6px 10px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: background 200ms ease, transform 200ms ease;
+    }
+    .range-btn:hover { transform: scale(0.98); }
+    .range-btn.active { background: linear-gradient(90deg, rgba(106,167,255,.22), rgba(178,106,255,.22)); color: #fff; }
+
+    /* Deep dive */
+    .deep-dive {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 16px;
+      margin-top: 8px;
+    }
+    .category-card {
+      backdrop-filter: blur(10px);
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 14px;
+      padding: 12px;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.25);
+      text-align: start;
+    }
+    .category-card h5 { margin: 0 0 10px; font-size: 14px; color: #e6ecff; }
+    .product-row {
+      display: grid;
+      grid-template-columns: 1fr auto auto auto;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+      border-top: 1px dashed rgba(255,255,255,0.12);
+    }
+    .product-row:first-of-type { border-top: 0; }
+    .product-name { color: #cfe1ff; font-weight: 700; font-size: 13px; }
+    .sparkline { width: 120px; height: 32px; }
+    .stat { font-size: 12px; color: #b9c2e6; text-align: end; }
+    .badge { display: inline-block; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.18); border-radius: 999px; padding: 2px 8px; color: #e6ecff; font-size: 11px; }
+
+    /* Accessibility: reduce motion */
+    @media (prefers-reduced-motion: reduce) {
+      * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+      .stage { animation: none !important; }
+    }
   </style>
 </head>
-<body>
+  <body>
   <header>NovaX AI</header>
 
   <h1>Effortless Conversations</h1>
   <p class="sub">Powerful Outcomes.</p>
 
-  <div class="stage"></div>
+  <div class="stage" aria-hidden="true"></div>
 
-  <div class="cards">
-    <div class="card">
-      <h3>Data Analysis in Seconds</h3>
-      <p>Debug and write code in multiple languages.</p>
+  <div class="tabs" role="tablist" aria-label="Primary">
+      <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="home-panel" id="home-tab">Home</button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="analytics-panel" id="analytics-tab">Analytics</button>
     </div>
-    <div class="card">
-      <h3>Your Daily Planner</h3>
-      <p>Automate routine tasks with ease.</p>
-    </div>
-  </div>
 
-  <div class="cta">
-    <button class="btn">Get Started</button>
-  </div>
+  <section id="home-panel" class="panel active" role="tabpanel" aria-labelledby="home-tab">
+      <div class="cards">
+        <div class="card">
+          <h3>Data Analysis in Seconds</h3>
+          <p>Debug and write code in multiple languages.</p>
+        </div>
+        <div class="card">
+          <h3>Your Daily Planner</h3>
+          <p>Automate routine tasks with ease.</p>
+        </div>
+      </div>
+
+      <div class="cta">
+        <button class="btn">Get Started</button>
+      </div>
+  </section>
+
+  <section id="analytics-panel" class="panel" role="tabpanel" aria-labelledby="analytics-tab">
+      <h3 class="section-title">Overview</h3>
+      <div class="kpis" id="kpi-cards">
+        <div class="kpi-card">
+          <div class="kpi-title">Total trending ideas</div>
+          <div class="metric" id="kpi-trending">0</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-title">% High demand</div>
+          <div class="metric" id="kpi-highdemand">0%</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-title">Avg demand score</div>
+          <div class="metric" id="kpi-avg">0</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-title">Predicted: Likely to explode</div>
+          <div class="metric" id="kpi-explode">#0</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-title">Conversion to Saved Ideas</div>
+          <div class="metric" id="kpi-conv">0% <small>(last 30d)</small></div>
+        </div>
+      </div>
+
+      <div class="charts-grid">
+        <div class="chart-card">
+          <div class="controls" role="group" aria-label="Time Range">
+            <button class="range-btn active" data-range="7">7d</button>
+            <button class="range-btn" data-range="30">30d</button>
+            <button class="range-btn" data-range="90">90d</button>
+          </div>
+          <h4>Demand score over time</h4>
+          <canvas id="tsCanvas"></canvas>
+        </div>
+        <div class="chart-card">
+          <h4>Top categories by avg demand</h4>
+          <canvas id="barCanvas"></canvas>
+        </div>
+        <div class="chart-card">
+          <h4>Demand by region</h4>
+          <canvas id="geoCanvas"></canvas>
+        </div>
+        <div class="chart-card">
+          <h4>Demand vs market size</h4>
+          <canvas id="bubbleCanvas"></canvas>
+        </div>
+      </div>
+
+      <h3 class="section-title">Deep Dive</h3>
+      <div class="deep-dive" id="deepDive"></div>
+    </section>
 
   <footer>
     <a href="#">Privacy Policy</a> •
     <a href="#">Terms and Conditions</a>
   </footer>
-</body>
+
+  <script>
+      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // Simple tab switching
+      const homeBtn = document.getElementById('home-tab');
+      const analyticsBtn = document.getElementById('analytics-tab');
+      const homePanel = document.getElementById('home-panel');
+      const analyticsPanel = document.getElementById('analytics-panel');
+      function setActive(tab) {
+        const isAnalytics = tab === 'analytics';
+        homeBtn.classList.toggle('active', !isAnalytics);
+        analyticsBtn.classList.toggle('active', isAnalytics);
+        homeBtn.setAttribute('aria-selected', String(!isAnalytics));
+        analyticsBtn.setAttribute('aria-selected', String(isAnalytics));
+        homePanel.classList.toggle('active', !isAnalytics);
+        analyticsPanel.classList.toggle('active', isAnalytics);
+        if (isAnalytics) {
+          const activeRangeBtn = document.querySelector('.range-btn.active');
+          const range = parseInt(activeRangeBtn?.dataset.range || '7', 10);
+          requestAnimationFrame(() => renderAll(range));
+        }
+      }
+      homeBtn.addEventListener('click', () => setActive('home'));
+      analyticsBtn.addEventListener('click', () => setActive('analytics'));
+
+      // Mock data generators
+      function randomBetween(min, max) { return Math.random() * (max - min) + min; }
+      function generateTimeSeries(days) {
+        const data = [];
+        let value = randomBetween(40, 70);
+        for (let i = days - 1; i >= 0; i--) {
+          value += randomBetween(-4, 4);
+          data.push({ x: new Date(Date.now() - i * 86400000), y: Math.max(0, Math.min(100, Math.round(value))) });
+        }
+        return data;
+      }
+
+      // KPI updates
+      function updateKPIs() {
+        const trending = Math.floor(randomBetween(120, 380));
+        const highPct = Math.round(randomBetween(24, 58));
+        const avg = Math.round(randomBetween(48, 76));
+        const explode = Math.floor(randomBetween(3, 15));
+        const conv = Math.round(randomBetween(10, 35));
+        document.getElementById('kpi-trending').textContent = trending.toString();
+        document.getElementById('kpi-highdemand').textContent = highPct + '%';
+        document.getElementById('kpi-avg').textContent = avg.toString();
+        document.getElementById('kpi-explode').textContent = '#' + explode;
+        document.getElementById('kpi-conv').innerHTML = conv + '% <small>(last 30d)</small>';
+      }
+
+      // Lightweight chart rendering using Canvas API
+      const tsCtx = document.getElementById('tsCanvas').getContext('2d');
+      const barCtx = document.getElementById('barCanvas').getContext('2d');
+      const geoCtx = document.getElementById('geoCanvas').getContext('2d');
+      const bubbleCtx = document.getElementById('bubbleCanvas').getContext('2d');
+
+      function clearCanvas(ctx) { const c = ctx.canvas; ctx.clearRect(0, 0, c.width, c.height); }
+      function sizeCanvasToDisplay(ctx) {
+        const ratio = window.devicePixelRatio || 1;
+        const { width, height } = ctx.canvas.getBoundingClientRect();
+        ctx.canvas.width = Math.max(1, Math.floor(width * ratio));
+        ctx.canvas.height = Math.max(1, Math.floor(height * ratio));
+        ctx.scale(ratio, ratio);
+      }
+
+      function drawLineChart(ctx, points, color) {
+        const rect = ctx.canvas.getBoundingClientRect();
+        ctx.save();
+        sizeCanvasToDisplay(ctx);
+        clearCanvas(ctx);
+        const w = rect.width, h = rect.height;
+        const pad = 16;
+        const xs = points.map(p => +p.x);
+        const ys = points.map(p => p.y);
+        const minY = Math.min(...ys) - 10;
+        const maxY = Math.max(...ys) + 10;
+        const minX = Math.min(...xs);
+        const maxX = Math.max(...xs);
+        ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i < 4; i++) {
+          const y = pad + (h - pad * 2) * (i / 3);
+          ctx.beginPath();
+          ctx.moveTo(pad, y);
+          ctx.lineTo(w - pad, y);
+          ctx.stroke();
+        }
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        points.forEach((p, i) => {
+          const x = pad + (w - pad * 2) * ((+p.x - minX) / (maxX - minX || 1));
+          const y = pad + (h - pad * 2) * (1 - ((p.y - minY) / (maxY - minY || 1)));
+          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawBarChart(ctx, items) {
+        const rect = ctx.canvas.getBoundingClientRect();
+        ctx.save();
+        sizeCanvasToDisplay(ctx);
+        clearCanvas(ctx);
+        const w = rect.width, h = rect.height;
+        const pad = 16;
+        const barW = (w - pad * 2) / items.length - 10;
+        const maxVal = Math.max(...items.map(i => i.value));
+        items.forEach((i, idx) => {
+          const x = pad + idx * ((w - pad * 2) / items.length) + 5;
+          const barH = (h - pad * 2) * (i.value / (maxVal || 1));
+          ctx.fillStyle = i.color;
+          ctx.fillRect(x, h - pad - barH, barW, barH);
+        });
+        ctx.restore();
+      }
+
+      function drawGeoHeat(ctx, regions) {
+        const rect = ctx.canvas.getBoundingClientRect();
+        ctx.save();
+        sizeCanvasToDisplay(ctx);
+        clearCanvas(ctx);
+        const w = rect.width, h = rect.height;
+        const pad = 10;
+        // Simple grid heat representation
+        const cols = 12, rows = 6;
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            const idx = r * cols + c;
+            const val = regions[idx % regions.length]?.value || 0;
+            const intensity = Math.min(1, val / 100);
+            ctx.fillStyle = `rgba(106,167,255,${0.15 + intensity * 0.55})`;
+            const cw = (w - pad * 2) / cols;
+            const ch = (h - pad * 2) / rows;
+            ctx.fillRect(pad + c * cw + 1, pad + r * ch + 1, cw - 2, ch - 2);
+          }
+        }
+        ctx.restore();
+      }
+
+      function drawBubbleChart(ctx, points) {
+        const rect = ctx.canvas.getBoundingClientRect();
+        ctx.save();
+        sizeCanvasToDisplay(ctx);
+        clearCanvas(ctx);
+        const w = rect.width, h = rect.height;
+        const pad = 16;
+        const maxX = Math.max(...points.map(p => p.demand));
+        const maxY = Math.max(...points.map(p => p.market));
+        points.forEach(p => {
+          const x = pad + (w - pad * 2) * (p.demand / (maxX || 1));
+          const y = pad + (h - pad * 2) * (1 - p.market / (maxY || 1));
+          const r = 6 + 14 * (p.confidence / 100);
+          ctx.beginPath();
+          ctx.fillStyle = `rgba(${180 - p.confidence}, ${120 + p.confidence/2}, 255, 0.6)`;
+          ctx.arc(x, y, r, 0, Math.PI * 2);
+          ctx.fill();
+        });
+        ctx.restore();
+      }
+
+      function renderAll(rangeDays) {
+        // KPIs
+        updateKPIs();
+
+        // Time series
+        const ts = generateTimeSeries(rangeDays);
+        drawLineChart(tsCtx, ts, 'rgba(127,160,255,0.9)');
+
+        // Bar categories
+        const categories = [
+          { name: 'AI Tools', value: Math.round(randomBetween(50, 100)), color: 'rgba(127,160,255,0.9)' },
+          { name: 'Health', value: Math.round(randomBetween(40, 90)), color: 'rgba(178,106,255,0.9)' },
+          { name: 'Finance', value: Math.round(randomBetween(30, 80)), color: 'rgba(127,160,255,0.7)' },
+          { name: 'Gaming', value: Math.round(randomBetween(20, 70)), color: 'rgba(178,106,255,0.7)' },
+          { name: 'EdTech', value: Math.round(randomBetween(20, 70)), color: 'rgba(127,160,255,0.6)' }
+        ];
+        drawBarChart(barCtx, categories);
+
+        // Geo heat
+        const regions = Array.from({ length: 36 }, () => ({ value: Math.round(randomBetween(10, 100)) }));
+        drawGeoHeat(geoCtx, regions);
+
+        // Bubble
+        const bubbles = Array.from({ length: 14 }, () => ({
+          demand: Math.round(randomBetween(10, 100)),
+          market: Math.round(randomBetween(10, 100)),
+          confidence: Math.round(randomBetween(40, 95))
+        }));
+        drawBubbleChart(bubbleCtx, bubbles);
+
+        // Deep dive per-category/products
+        const deep = document.getElementById('deepDive');
+        deep.innerHTML = '';
+        ['AI Tools', 'Health', 'Gaming'].forEach(cat => {
+          const card = document.createElement('div');
+          card.className = 'category-card';
+          const products = Array.from({ length: 4 }, (_, i) => ({
+            name: cat + ' Product ' + (i + 1),
+            growth: (randomBetween(0.5, 8)).toFixed(1) + '%',
+            confidence: Math.round(randomBetween(40, 95)),
+            price: '$' + Math.round(randomBetween(9, 149)),
+            discussions: Math.round(randomBetween(12, 480))
+          }));
+          card.innerHTML = `
+            <h5>${cat}</h5>
+            ${products.map(p => `
+              <div class="product-row">
+                <div class="product-name">${p.name} <span class="badge">${p.discussions} related</span></div>
+                <canvas class="sparkline"></canvas>
+                <div class="stat">${p.growth}</div>
+                <div class="stat">${p.confidence}%</div>
+                <div class="stat">${p.price}</div>
+              </div>
+            `).join('')}
+          `;
+          deep.appendChild(card);
+          const canvases = card.querySelectorAll('canvas.sparkline');
+          canvases.forEach(cv => {
+            const c = cv.getContext('2d');
+            const points = generateTimeSeries(14);
+            // tiny sparkline
+            const rect = cv.getBoundingClientRect();
+            c.save();
+            const ratio = window.devicePixelRatio || 1;
+            cv.width = Math.max(1, Math.floor(rect.width * ratio));
+            cv.height = Math.max(1, Math.floor(rect.height * ratio));
+            c.scale(ratio, ratio);
+            c.clearRect(0, 0, rect.width, rect.height);
+            c.strokeStyle = 'rgba(127,160,255,0.9)';
+            c.lineWidth = 1.5;
+            const w = rect.width, h = rect.height, pad = 2;
+            const xs = points.map(p => +p.x);
+            const ys = points.map(p => p.y);
+            const minY = Math.min(...ys), maxY = Math.max(...ys);
+            const minX = Math.min(...xs), maxX = Math.max(...xs);
+            c.beginPath();
+            points.forEach((p, i) => {
+              const x = pad + (w - pad * 2) * ((+p.x - minX) / (maxX - minX || 1));
+              const y = pad + (h - pad * 2) * (1 - ((p.y - minY) / (maxY - minY || 1)));
+              if (i === 0) c.moveTo(x, y); else c.lineTo(x, y);
+            });
+            c.stroke();
+            c.restore();
+          });
+        });
+      }
+
+      // Time range buttons
+      document.querySelectorAll('.range-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const range = parseInt(btn.dataset.range || '7', 10);
+          renderAll(range);
+        });
+      });
+
+      // Initial render
+      renderAll(7);
+      window.addEventListener('resize', () => {
+        const active = document.querySelector('.range-btn.active');
+        const range = parseInt(active?.dataset.range || '7', 10);
+        renderAll(range);
+      }, { passive: true });
+    </script>
+  </body>
 </html>
