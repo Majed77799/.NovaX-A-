@@ -1,0 +1,90 @@
+name: Health Gate
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: read
+  statuses: write
+
+jobs:
+  health-gate:
+    name: Health Gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate Health Gate checklist
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request || {};
+            const body = pr.body || '';
+            const sha = (pr.head && pr.head.sha) ? pr.head.sha : context.sha;
+            const targetUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+
+            // Find the Health Gate section (header can be any level ##..######)
+            const headerRegex = /^\s{0,3}#{2,6}\s*Health Gate\s*$/im;
+            const headerMatch = body.match(headerRegex);
+            if (!headerMatch) {
+              await github.rest.repos.createCommitStatus({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                sha,
+                state: 'failure',
+                context: 'Health Gate',
+                description: 'Missing "Health Gate" section in PR body',
+                target_url: targetUrl,
+              });
+              core.setFailed('Missing "Health Gate" section in the PR description.');
+              return;
+            }
+
+            // Extract content from the header to the next header or end of body
+            const startIndex = headerMatch.index + headerMatch[0].length;
+            const afterHeader = body.slice(startIndex);
+            const nextHeaderIdx = afterHeader.search(/^\s{0,3}#{2,6}\s+/m);
+            const section = nextHeaderIdx === -1 ? afterHeader : afterHeader.slice(0, nextHeaderIdx);
+
+            // Find checklist items
+            const items = section.match(/- \[( |x|X)\] .+/g) || [];
+            if (items.length === 0) {
+              await github.rest.repos.createCommitStatus({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                sha,
+                state: 'failure',
+                context: 'Health Gate',
+                description: 'No checklist items under "Health Gate"',
+                target_url: targetUrl,
+              });
+              core.setFailed('No checklist items found under the "Health Gate" section.');
+              return;
+            }
+
+            const unchecked = items.filter(line => !/\[x\]/i.test(line));
+            if (unchecked.length > 0) {
+              await github.rest.repos.createCommitStatus({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                sha,
+                state: 'failure',
+                context: 'Health Gate',
+                description: `Health Gate has ${unchecked.length} unchecked item(s)` ,
+                target_url: targetUrl,
+              });
+              core.setFailed(`Health Gate has ${unchecked.length} unchecked item(s):\n` + unchecked.join('\n'));
+              return;
+            }
+
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha,
+              state: 'success',
+              context: 'Health Gate',
+              description: 'All Health Gate items are checked',
+              target_url: targetUrl,
+            });
+            core.info('All Health Gate items are checked.');
+
