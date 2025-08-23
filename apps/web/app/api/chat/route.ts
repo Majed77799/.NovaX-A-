@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server';
 import { generateStreaming } from '@repo/ai';
 import { ChatMessage, createSSEHeaders, detectLanguage } from '@repo/shared';
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 
 export async function POST(req: NextRequest) {
 	const body = await req.json().catch(() => null) as { messages: ChatMessage[] } | null;

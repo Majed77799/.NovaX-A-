@@ -15,7 +15,6 @@ export default withPWA({
 	transpilePackages: ['@repo/shared', '@repo/ai', '@repo/api-client'],
 	reactStrictMode: true,
 	eslint: { ignoreDuringBuilds: true },
-	api: { bodyParser: { sizeLimit: '1mb' } },
 	async headers() {
 		const corsOrigin = process.env.NOVAX_CORS_ORIGIN || '*';
 		return [
